@@ -1,7 +1,11 @@
 "use strict";
-let age = 23;
-if (age > 10) {
-    age += 10;
+Object.defineProperty(exports, "__esModule", { value: true });
+let name = "mostafa";
+let number = 123456789;
+let isPublished = false;
+let course;
+function sayHello(argument) {
+    console.log(argument);
 }
-console.log(age);
+let myArray = [1, 2, 4, '5'];
 //# sourceMappingURL=index.js.map
