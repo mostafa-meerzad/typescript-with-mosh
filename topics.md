@@ -32,11 +32,13 @@ Js
 
 Ts
 
-- any
+- [any](#any-type)
 - unknown
 - never
-- enum
-- tuple
+- [array](#array-type)
+- [enum](#enum-type)
+- [tuple](#tuple-type)
+- [function](#functions)
 
 `let name: string = "mostafa"` this is how to annotate the variable type in **Ts**
 
@@ -53,7 +55,7 @@ let course;
 
 ### any type
 
-if you declare a variable and not initialize it with a value, **typescript** with give it a default type of **any** 
+if you declare a variable and not initialize it with a value, **typescript** with give it a default type of **any**
 `let course;` by **any** type you lose the benefit of using **typescript**, avoid as much as possible.
 
 if given a function or part of an app that you can not infer the type use **any**
@@ -70,3 +72,96 @@ need an empty array define the type at the same time
 
 `let numbers: string[] = []` empty array that can only hold strings
 
+### tuple type
+
+a tuple is a fixed-length array where each element has a particular type, often used when working with a pair of values
+
+for each user you want to represent a pair of values
+
+`let user = [number, string] = [1, "Mostafa"]`
+
+### enum type
+
+an enum represents a list of related constants
+
+- numeric enums
+- string enums
+
+numeric enums are initialized by default starting from 0 and incremented as you add more
+
+string enums has to be initialized as you add more enums
+
+use PascalCase for naming enums
+
+`enum Size {Small, Medium, Large}` Small by default is initialized by 0, Medium 1 and Large 2
+
+`enum Size {Small = 10, Medium, Large}` Small is 10, Medium 11 and Large 12
+
+`enum Size {Small = "sm", Medium = "md", Large = "lg"}`
+
+`enum SomeEnum {}` will output in a verbose way to solve it just declare your enum as a `const enum SomeEnum {}`
+
+### functions
+
+**typescript** compiler can infer the return type of your functions
+
+- always annotate you functions
+
+* enable these compiler options as best-practice
+
+  `"noImplicitReturns": true,`
+
+  `"noUnusedParameters": true, `
+
+  `"noUnusedLocals": true,`
+
+```ts
+function greet(name: string): void {
+  console.log(name);
+}
+```
+
+```ts
+function greet(name: string, age?: number): string {
+  return `Hello ${name}, How are you!`;
+}
+```
+
+```ts
+function greet(name = "John"): string {
+  return `Hello ${name}, How are you!`;
+}
+```
+
+### objects
+
+defining an object
+
+`let employee: {id:number, name:string} = {id= 1, name:"John"}`
+
+readonly property (id is readonly now and you can't change it at run time)
+
+`let employee: {readonly id:number, name:string} = {id= 1, name:"John"}`
+
+optional property
+
+```ts
+    let employee: {readonly id:number, name:string, fax?:string} = {id= 1, name:"John"}
+
+```
+
+defining a method to an object
+
+the general syntax is `{methodName:(arg:type)=>type}`
+
+we use **arrow-function** syntax to add a method to our **object**, define method input data-type after that put **=>** and specify return type
+
+```ts
+let dog:{name:string, age:number, eat:(food:string)=>void} = {
+    name:"Sparky", age:3, eat:(food:string)=>{
+        console.log("eating ", food)
+    }
+}
+````
+
+`let employee:{ id:number, name:string, retire:(date:Date)=>void} = {id:1, name:"John", retire:(date:Date)=>console.log(date)}`
