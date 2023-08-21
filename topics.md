@@ -55,6 +55,8 @@ let course;
 
 ### any type
 
+type **any** means the variable can hold any kind of values just like a dynamic-typed variable in javascript.
+
 if you declare a variable and not initialize it with a value, **typescript** with give it a default type of **any**
 `let course;` by **any** type you lose the benefit of using **typescript**, avoid as much as possible.
 
@@ -103,6 +105,8 @@ use PascalCase for naming enums
 
 ### functions
 
+basically means that you should clarify what values the arguments, and the returned value be if it returns any value otherwise return type is **void** meaning (not returning anything)
+
 **typescript** compiler can infer the return type of your functions
 
 - always annotate you functions
@@ -145,6 +149,11 @@ readonly property (id is readonly now and you can't change it at run time)
 
 optional property
 
+by putting a **?** after object property 
+
+` let myObject:{prop1: string, prop2?:string}` prop2 is now optional, but now you are creating another  problem if you try to access prop2 and it is not provided.
+
+
 ```ts
     let employee: {readonly id:number, name:string, fax?:string} = {id= 1, name:"John"}
 
@@ -165,3 +174,154 @@ let dog:{name:string, age:number, eat:(food:string)=>void} = {
 ````
 
 `let employee:{ id:number, name:string, retire:(date:Date)=>void} = {id:1, name:"John", retire:(date:Date)=>console.log(date)}`
+
+
+## Advanced types
+
+### Type alias
+
+create a **type** and use it multiple times
+
+```ts
+
+let dog:{name:string, age:number, eat:(food:string)=>void} = {
+    name:"Sparky", age:3, eat:(food:string)=>{
+        console.log("eating ", food)
+    }
+}
+
+```
+
+if you need to create more **employee** objects then you need to repeat the above structure or new employee objects might have new properties and do not share a consistent shape, in this situations use **type alias**
+
+`type TypeName = {}` this way we can define a custom type, PascalCase for naming convention
+
+annotate the object with custom type you create
+
+
+```ts
+
+type Employee = { name: string; age: number; retire: (date: Date) => void }
+
+// now when you create an object annotate it with tye custom-type you just created
+
+let john: Employee = {
+  name: "John",
+  age: 40,
+  retire: (date: Date) => {
+    console.log(date);
+  },
+};
+```
+
+### union types
+
+define a type that can be either type *A* or type *B* or more.
+
+`let weight: number | string `
+
+`weight = 100`
+
+`weight = "100kg"`
+
+with **union types** you can specify more than one type for a variable or function argument.
+
+by using **|** you create a union type `let age:number | string = "23years"` `let age:number | string = 23`
+
+```ts
+function kgToLb(weight: number | string): number {
+  // narrowing
+  // narrowing a union type into a more specific type
+  if (typeof weight === "number") return weight * 2.2;
+  else return parseInt(weight) * 2.2;
+}
+
+console.log(kgToLb(10))
+console.log(kgToLb("10Kg"))
+
+```
+
+
+### intersection types
+
+means to define a type that is a combination of two or more types
+
+create a type that is both of two types
+
+```ts
+type Draggable = {
+    drag:()=>void
+}
+
+type Resizable = {
+    resize:()=>void
+}
+
+type UiWidget = Draggable & Resizable
+
+let textBox: UiWidget = {
+    drag:()=>{},
+    resize:()=>{}
+}
+```
+
+
+### literal types
+literal types mean exact types
+
+if you want to limit the values can be assigned to a variable use **literal** types
+
+```ts
+
+// let age: 50 | 100 = 50 // age can only be 50 or 100
+// let age: number = 50 // this way age is a number and can be assigned any number
+
+type Age = 50 | 100 // step-up your code this way
+
+let age: Age = 50
+
+type Quantity = 50 | 100
+
+let age2: Quantity = 40 // this causes a compilation error
+
+console.log(age)
+```
+
+### nullable types
+
+nullable is the act of explicitly allowing your functions/code to accept null values without any side effects.
+
+if you need to work with lets say **null**  as a function argument, by default typescript is very restrict about using this kind of values
+
+use **union types** to make it possible to use null values in your app without causing your app to crash 
+```ts
+
+function greet(name:string | null | undefined):void{
+    if(name)
+        console.log(name.toUpperCase())
+    console.log("Hola")
+}
+
+
+greet(null)
+greet("John")
+```
+
+
+### optional chaining
+
+is the act of accessing array elements, object properties or even calling a function optionally.
+
+if there is an array, object or function defined then get the element, property or call the function 
+
+when working with **nullables** we often need to do type checks
+
+
+```ts
+// optional element access operator
+customer?.[0] // access the first element if customer is an array
+
+
+let log: any = null
+log?.('a') // optional call
+```

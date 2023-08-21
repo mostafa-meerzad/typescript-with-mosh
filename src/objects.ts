@@ -30,7 +30,14 @@ let employee: {
   
   // with arrow function syntax
   
-  let dog:{name: string, age:number, eat:(food:string)=>void} = {name: "Snowy", age: 2, eat:(food:string)=>{
+  let dog:{
+    name: string,
+    age:number,
+    eat:(food:string)=>void
+  } = {
+    name: "Snowy",
+    age: 2,
+    eat:(food:string)=>{
       console.log("eating ", food)
   }}
   
