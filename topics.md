@@ -325,3 +325,94 @@ customer?.[0] // access the first element if customer is an array
 let log: any = null
 log?.('a') // optional call
 ```
+
+### nullish coalescing operator
+
+if you need to check if an input value is **null** or **undefined** then give it a default value otherwise use the input value itself, here is the nullish coalescing operator that comes handy.
+
+```ts
+let speed: number | null = null // speed is an input from the user, (null) if not provided, otherwise use the input
+
+
+let rid = {
+  speed: speed ?? 30 // if speed is null or undefined 30 is used as the default value otherwise speed (the input)is used 
+}
+```
+
+### type assertions
+
+In Typescript, Type assertion is a technique that informs the compiler about the type of a variable. You can use type assertion to specify a value's type and tell the compiler not to deduce it.
+
+in simple words use **type assertion** when you know more about a variable type than **Ts compiler**.
+
+```ts
+
+// let phone = document.getElementById("phone")  // imagine we have an HTML element with this id
+
+let phone = document.getElementById("phone") as HTMLInputElement
+
+// what happens if you don't use type-assertion here?
+
+// as you can see we are expecting the phone to be an input-element but TS thinks the target element is just a normal HTMLElement thus it complains about accessing the "value" property 
+
+// let value = phone.value() // complaining about calling value property
+
+
+let value = phone.value // now you can get the value of the input-element
+
+```
+
+```ts
+
+let phone = document.getElementById("phone") as HTMLInputElement // one way 
+
+let phone = <HTMLInputElement> document.getElementById("phone") // the other way
+
+```
+
+### unknown type
+
+unknown is the type-safe counterpart of any . Anything is assignable to unknown , but unknown isn't assignable to anything but itself and any without a type assertion or a control flow based narrowing. Likewise, no operations are permitted on an unknown without first asserting or narrowing to a more specific type.
+
+```ts
+// by type "any" you can call any methods that doesn't exist which is BAD
+// function render (document: any){
+// document.run()
+// document.fly()
+// document.whateverWeWant()
+// }
+
+
+// by type "unknown" you can't call any method that doesn't exist
+// use type narrowing to first check the type and then call a method or access a property
+function render (document: unknown){
+
+    //typeof is only working with primitive-types 
+    if( typeof document === "string")
+        document.toLowerCase()
+
+    // instanceof is used for object types/ custom types
+    if( document instanceof Array)
+        document.length
+
+// document.whateverWeWant()
+}
+```
+
+
+### never type 
+
+The never type represents the type of values that never occur. For instance, never is the return type for a function expression or an arrow function expression that always throws an exception or one that never returns. 
+
+```ts
+
+// processEvents function lets say is a function that run continuously and process a bunch of events
+function processEvents():never {
+  while (true) {
+    // process an event
+  }
+}
+
+processEvents()
+console.log("something after processing events")
+```
