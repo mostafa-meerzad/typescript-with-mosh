@@ -507,3 +507,75 @@ class Account {
    - While the constructor itself is sufficient for initializing objects, the type annotations for class properties (`id: number;`, `owner: string;`, `balance: number;`) provide additional information to developers and tools about the expected types of these properties.
 
 In summary, this TypeScript class is designed to represent an `Account` with three properties (`id`, `owner`, and `balance`). The type annotations help catch potential type-related errors, and the constructor initializes the object with the provided values. The combination of class properties and a constructor allows for the creation of instances of the `Account` class with specific attributes.
+
+### Instantiating a new object from a class
+
+```ts
+class Account {
+  id: number;
+  owner: string;
+  balance: number;
+
+  constructor(id: number, owner: string, balance: number) {
+    this.id = id;
+    this.owner = owner;
+    this.balance = balance;
+  }
+
+  deposit(amount: number): void {
+    if (amount <= 0) throw new Error("Invalid amount");
+    this.balance += amount;
+  }
+}
+
+const account = new Account(10, "Mostafa", 0);
+
+console.log(account.id);
+console.log(account.owner);
+console.log(account.balance);
+console.log("deposit 1000");
+account.deposit(1000);
+console.log(account.balance);
+```
+
+### ReadOnly and Optional properties
+
+```ts
+
+class Account {
+  // in this implementation the id property can be changed anywhere in this code
+
+  // to solve this issue we can make id property readOnly
+  readonly id: number;
+  owner: string;
+  balance: number;
+
+  constructor(id: number, owner: string, balance: number) {
+    this.id = id;
+    this.owner = owner;
+    this.balance = balance;
+  }
+
+  deposit(amount: number): void {
+
+    // we can change the id here
+    // this.id = 0 // which is not something we wont to happen in our code, it creates bugs!
+
+    if (amount <= 0) throw new Error("Invalid amount");
+    this.balance += amount;
+  }
+}
+
+
+const account = new Account(10, "Mostafa", 0)
+
+// or we can change id property right here 
+// account.id = 0
+
+console.log(account.id)
+console.log(account.owner)
+console.log(account.balance)
+console.log("deposit 1000")
+account.deposit(1000)
+console.log(account.balance)
+```

@@ -11,5 +11,5 @@ function err(message: string): never {
   
   // processEvents()
   err("...");
-  console.log("something after processing events");
+  // console.log("something after processing events");
   

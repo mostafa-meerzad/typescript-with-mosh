@@ -1,12 +1,21 @@
 "use strict";
-function getCustomer(id) {
-    return id === 0 ? null : { birthDate: new Date() };
+class Account {
+    constructor(id, owner, balance) {
+        this.id = id;
+        this.owner = owner;
+        this.balance = balance;
+    }
+    deposit(amount) {
+        if (amount <= 0)
+            throw new Error("Invalid amount");
+        this.balance += amount;
+    }
 }
-let customer = getCustomer(1);
-// the old way of checking the customer type
-if (customer !== null && customer !== undefined)
-    console.log(customer.birthDate);
-// console.log(customer.birthDate)// error customer is possibly null
-console.log(customer === null || customer === void 0 ? void 0 : customer.birthDate); // by putting a "?" followed by "." we are telling that if customer is not "null" or "undefined" the access the birthDate property (optional chaining)
-console.log(customer === null || customer === void 0 ? void 0 : customer.birthDate.getFullYear()); // getting the same error as previous because we set birthDate as optional
+const account = new Account(10, "Mostafa", 0);
+console.log(account.id);
+console.log(account.owner);
+console.log(account.balance);
+console.log("deposit 1000");
+account.deposit(1000);
+console.log(account.balance);
 //# sourceMappingURL=index.js.map
