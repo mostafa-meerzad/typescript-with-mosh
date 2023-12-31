@@ -541,7 +541,6 @@ console.log(account.balance);
 ### ReadOnly and Optional properties
 
 ```ts
-
 class Account {
   // in this implementation the id property can be changed anywhere in this code
 
@@ -557,7 +556,6 @@ class Account {
   }
 
   deposit(amount: number): void {
-
     // we can change the id here
     // this.id = 0 // which is not something we wont to happen in our code, it creates bugs!
 
@@ -566,16 +564,83 @@ class Account {
   }
 }
 
+const account = new Account(10, "Mostafa", 0);
 
-const account = new Account(10, "Mostafa", 0)
-
-// or we can change id property right here 
+// or we can change id property right here
 // account.id = 0
 
-console.log(account.id)
-console.log(account.owner)
-console.log(account.balance)
-console.log("deposit 1000")
-account.deposit(1000)
-console.log(account.balance)
+console.log(account.id);
+console.log(account.owner);
+console.log(account.balance);
+console.log("deposit 1000");
+account.deposit(1000);
+console.log(account.balance);
 ```
+
+### Access Control Keywords or Access Modifiers
+
+In TypeScript, access modifiers are keywords used to control the visibility and accessibility of class members (properties and methods). There are three main access modifiers in TypeScript:
+
+1. **public:**
+
+   - Members marked as `public` are accessible from any part of the code, both within and outside the class.
+
+   ```typescript
+   class Example {
+     public x: number;
+
+     constructor(x: number) {
+       this.x = x;
+     }
+   }
+
+   const obj = new Example(10);
+   console.log(obj.x); // Accessing public property
+   ```
+
+2. **private:**
+   - Members marked as `private` are only accessible within the class where they are defined. They cannot be accessed from outside the class.
+
+**Note**: by convention **private** properties are prefixed with an underscore **\_**
+
+```typescript
+class Example {
+  private x: number;
+
+  constructor(x: number) {
+    this.x = x;
+  }
+
+  getX(): number {
+    return this.x; // Accessing private property within the class
+  }
+}
+
+const obj = new Example(10);
+// console.log(obj.x); // Error: Property 'x' is private and only accessible within class 'Example'.
+```
+
+3. **protected:**
+
+   - Members marked as `protected` are similar to `private` members but with an additional feature: they can be accessed by subclasses. They are not accessible from outside the class.
+
+   ```typescript
+   class Parent {
+     protected x: number;
+
+     constructor(x: number) {
+       this.x = x;
+     }
+   }
+
+   class Child extends Parent {
+     printX(): void {
+       console.log(this.x); // Accessing protected property in a subclass
+     }
+   }
+
+   const childObj = new Child(20);
+   // console.log(childObj.x); // Error: Property 'x' is protected and only accessible within class 'Parent' and its subclasses.
+   ```
+
+By default, if you don't specify an access modifier, TypeScript assumes `public`. It's good practice to explicitly specify access modifiers to make the code more readable and to enforce access control.
