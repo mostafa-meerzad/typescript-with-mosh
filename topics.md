@@ -644,3 +644,46 @@ const obj = new Example(10);
    ```
 
 By default, if you don't specify an access modifier, TypeScript assumes `public`. It's good practice to explicitly specify access modifiers to make the code more readable and to enforce access control.
+
+### Parameter Properties
+
+In TypeScript, parameter properties are a way to declare and initialize class properties directly in the constructor parameters. This can be a concise way to define and initialize class properties without the need for explicit property declarations in the class body. Parameter properties are commonly used when you want to quickly declare and initialize instance variables based on constructor parameters.
+
+Here's an example:
+
+```typescript
+class Person {
+  // Using parameter properties
+  constructor(public name: string, private age: number) {
+    // The properties name and age are automatically created and initialized
+    // based on the constructor parameters.
+  }
+
+  // Other methods and properties can be defined here.
+}
+
+// Usage
+const person = new Person("John", 25);
+console.log(person.name); // Accessible because 'name' is public
+// console.log(person.age); // Error: 'age' is private and cannot be accessed outside the class
+```
+
+In the example above, the `name` parameter has the `public` modifier, and the `age` parameter has the `private` modifier. This automatically creates and initializes class properties with the same names in the constructor.
+
+Parameter properties can have access modifiers (`public`, `private`, or `protected`) and can also be marked as `readonly`. The presence of the `readonly` modifier means that the property can only be set during initialization and cannot be modified afterward.
+
+```typescript
+class Person {
+  // Using parameter properties with access modifiers and readonly
+  constructor(public readonly name: string, private readonly age: number) {
+    // The properties name and age are automatically created, initialized,
+    // and marked as readonly based on the constructor parameters.
+  }
+
+  // Other methods and properties can be defined here.
+}
+```
+
+In this example, both `name` and `age` are marked as `readonly`, meaning their values cannot be changed once they are set in the constructor.
+
+Parameter properties can be a convenient way to reduce boilerplate code when creating classes with properties initialized from constructor parameters.
