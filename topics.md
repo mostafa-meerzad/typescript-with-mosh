@@ -687,3 +687,69 @@ class Person {
 In this example, both `name` and `age` are marked as `readonly`, meaning their values cannot be changed once they are set in the constructor.
 
 Parameter properties can be a convenient way to reduce boilerplate code when creating classes with properties initialized from constructor parameters.
+
+### Getters and Setter
+
+In TypeScript, getters and setters are used to define and access the properties of a class in a controlled manner. They are a part of the ECMAScript 5 (ES5) property descriptor syntax and provide a way to encapsulate the internal state of an object. Getters are used to retrieve the value of a property, while setters are used to set the value of a property.
+
+Here's a basic example of using getters and setters in TypeScript:
+
+```typescript
+class Rectangle {
+  private _width: number;
+  private _height: number;
+
+  constructor(width: number, height: number) {
+    this._width = width;
+    this._height = height;
+  }
+
+  // Getter for width
+  get width(): number {
+    return this._width;
+  }
+
+  // Setter for width
+  set width(value: number) {
+    if (value > 0) {
+      this._width = value;
+    } else {
+      console.log("Width must be greater than 0");
+    }
+  }
+
+  // Getter for height
+  get height(): number {
+    return this._height;
+  }
+
+  // Setter for height
+  set height(value: number) {
+    if (value > 0) {
+      this._height = value;
+    } else {
+      console.log("Height must be greater than 0");
+    }
+  }
+
+  // Getter for area
+  get area(): number {
+    return this._width * this._height;
+  }
+}
+
+// Usage
+const rectangle = new Rectangle(5, 10);
+console.log(rectangle.width); // Using the getter
+console.log(rectangle.height); // Using the getter
+console.log(rectangle.area); // Using the getter
+
+rectangle.width = 8; // Using the setter
+rectangle.height = 15; // Using the setter
+
+console.log(rectangle.width); // Using the getter
+console.log(rectangle.height); // Using the getter
+console.log(rectangle.area); // Using the getter
+```
+
+In this example, the `Rectangle` class has private properties `_width` and `_height`, and public getters and setters for these properties. The getters and setters allow controlled access to the internal state of the object, enabling additional logic or validation to be applied when getting or setting the values.
