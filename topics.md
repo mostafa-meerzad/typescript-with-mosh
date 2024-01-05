@@ -753,3 +753,39 @@ console.log(rectangle.area); // Using the getter
 ```
 
 In this example, the `Rectangle` class has private properties `_width` and `_height`, and public getters and setters for these properties. The getters and setters allow controlled access to the internal state of the object, enabling additional logic or validation to be applied when getting or setting the values.
+
+## Index Signatures
+
+In TypeScript, index signatures allow you to define the types of properties that can exist on an object with keys that are not known at compile time. This is particularly useful when working with objects that can have dynamic property names. Index signatures are specified using square brackets `[]` and a specific type for the keys.
+
+Here's a basic syntax for index signatures:
+
+```typescript
+interface SomeObject {
+  [key: string]: valueType;
+}
+```
+
+Here, `[key: string]` is the index signature. It indicates that any property with a string key can exist on the object, and the associated value must be of type `valueType`.
+
+Let's look at an example:
+
+```typescript
+interface Car {
+  brand: string;
+  model: string;
+  [key: string]: string; // Index signature allowing any additional string properties
+}
+
+const myCar: Car = {
+  brand: "Toyota",
+  model: "Camry",
+  color: "blue",   // Valid
+  year: "2022",    // Valid
+  // someNumber: 123 // Error: Property 'someNumber' does not exist on type 'Car'.
+};
+```
+
+In this example, the `Car` interface has specific properties `brand` and `model`, and it also allows any additional properties with string keys and string values. This means you can add any string-keyed properties to objects of type `Car` beyond the explicitly declared ones.
+
+It's important to note that the index signature allows you to add properties, but it doesn't enforce that all properties must have the same type. In the example above, the additional properties must be of type `string`, but you could have different values for different properties.
