@@ -33,6 +33,8 @@ const account = new Account(10, "Mostafa", 1000);
 // console.log(account.getBalance())
 console.log("accessing the balance using balance-getter method");
 console.log(account.balance);
+console.log("set balance using a setter method");
 account.balance = 10;
+console.log("now balance after setting it");
 console.log(account.balance);
 //# sourceMappingURL=gettersAndSetters.js.map

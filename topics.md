@@ -789,3 +789,176 @@ const myCar: Car = {
 In this example, the `Car` interface has specific properties `brand` and `model`, and it also allows any additional properties with string keys and string values. This means you can add any string-keyed properties to objects of type `Car` beyond the explicitly declared ones.
 
 It's important to note that the index signature allows you to add properties, but it doesn't enforce that all properties must have the same type. In the example above, the additional properties must be of type `string`, but you could have different values for different properties.
+
+## Static Members
+
+In TypeScript, static members refer to properties or methods that belong to a class itself rather than to instances of the class. They are associated with the class itself, not with the instances created from the class. Static members are declared using the `static` keyword in TypeScript.
+
+Here's an example to illustrate static members in TypeScript:
+
+```typescript
+class MyClass {
+  static staticProperty: number = 42;
+
+  static staticMethod(): void {
+    console.log("This is a static method.");
+  }
+
+  instanceProperty: string;
+
+  constructor(value: string) {
+    this.instanceProperty = value;
+  }
+
+  instanceMethod(): void {
+    console.log("This is an instance method.");
+  }
+}
+
+// Accessing static members without creating an instance
+console.log(MyClass.staticProperty); // Output: 42
+MyClass.staticMethod(); // Output: This is a static method.
+
+// Creating instances of the class
+const instance1 = new MyClass("Instance 1");
+const instance2 = new MyClass("Instance 2");
+
+// Accessing instance members
+console.log(instance1.instanceProperty); // Output: Instance 1
+instance1.instanceMethod(); // Output: This is an instance method.
+
+console.log(instance2.instanceProperty); // Output: Instance 2
+instance2.instanceMethod(); // Output: This is an instance method.
+```
+
+In this example, `staticProperty` and `staticMethod` are static members of the `MyClass` class. They are accessed directly on the class itself, without the need to create an instance of the class. On the other hand, `instanceProperty` and `instanceMethod` are instance members, and they can be accessed only through instances of the class.
+
+### Static Members Usage
+
+Static members in TypeScript (and other object-oriented programming languages) serve various purposes and are used in different scenarios. Here are some common use cases for static members:
+
+1. **Shared Data**: Static members are shared among all instances of a class. They provide a way to store data that is common to all instances and is associated with the class itself. This can be useful for maintaining shared state or configuration.
+
+    ```typescript
+    class Logger {
+      static logLevel: string = "info";
+
+      static log(message: string): void {
+        if (Logger.logLevel === "info") {
+          console.log(message);
+        }
+      }
+    }
+
+    Logger.log("This is an informational message.");
+    ```
+
+2. **Utility Functions**: Static methods can be used to define utility functions that are related to the class but do not depend on the state of any specific instance. These methods can be called directly on the class.
+
+    ```typescript
+    class MathUtils {
+      static add(x: number, y: number): number {
+        return x + y;
+      }
+    }
+
+    const result = MathUtils.add(3, 5);
+    ```
+
+3. **Constants**: Static members can be used to define constants associated with a class. These values are the same for all instances and can be accessed without creating an instance.
+
+    ```typescript
+    class Constants {
+      static PI: number = 3.14159;
+    }
+
+    console.log(Constants.PI);
+    ```
+
+4. **Factory Methods**: Static methods can be used to create instances of a class or provide alternative ways of instantiation.
+
+    ```typescript
+    class Point {
+      constructor(public x: number, public y: number) {}
+
+      static createOrigin(): Point {
+        return new Point(0, 0);
+      }
+    }
+
+    const origin = Point.createOrigin();
+    ```
+
+5. **Singleton Pattern**: Static members can be used to implement singleton patterns, ensuring that only one instance of a class is created.
+
+    ```typescript
+    class Singleton {
+      private static instance: Singleton;
+
+      private constructor() {}
+
+      static getInstance(): Singleton {
+        if (!Singleton.instance) {
+          Singleton.instance = new Singleton();
+        }
+        return Singleton.instance;
+      }
+    }
+
+    const singletonInstance1 = Singleton.getInstance();
+    const singletonInstance2 = Singleton.getInstance();
+    console.log(singletonInstance1 === singletonInstance2); // true
+    ```
+
+These are just a few examples, and the use of static members can vary based on the design and requirements of your application. They provide a way to organize and encapsulate functionality that is associated with a class as a whole rather than with instances of the class.
+
+### Static Keyword vs Access-Modifiers
+
+No, the `static` keyword is not an access modifier in TypeScript, although it is often used in conjunction with access modifiers.
+
+Access modifiers in TypeScript include `public`, `private`, and `protected`. They define the visibility and accessibility of class members (properties and methods) within and outside the class.
+
+On the other hand, the `static` keyword is used to define static members, which are associated with the class itself rather than with instances of the class. It doesn't control access to the member; instead, it indicates that the member is a part of the class rather than its instances.
+
+Here's a brief summary:
+
+- **Access Modifiers:**
+  - `public`: The member is accessible from outside the class.
+  - `private`: The member is only accessible within the class.
+  - `protected`: The member is accessible within the class and its subclasses.
+
+- **Static Keyword:**
+  - `static`: Indicates that the member belongs to the class itself, not to instances. It doesn't affect the visibility or access level; it's more about the nature of the member being shared among all instances.
+
+Example using access modifiers and static keyword:
+
+```typescript
+class Example {
+  public instanceProperty: number;  // Public instance property
+  private static staticProperty: string = "Static property";  // Private static property
+
+  constructor(value: number) {
+    this.instanceProperty = value;
+  }
+
+  static staticMethod(): void {
+    console.log("This is a static method.");
+    // Accessing static property within the class is allowed
+    console.log(Example.staticProperty);
+  }
+}
+
+const instance = new Example(42);
+
+// Accessing public instance property
+console.log(instance.instanceProperty);
+
+// Accessing static method without creating an instance
+Example.staticMethod();
+
+// This would cause an error because static properties are not accessible on instances
+// console.log(instance.staticProperty);
+```
+
+In this example, `instanceProperty` is a public instance property, and `staticProperty` is a private static property. The `static` keyword is used to define `staticMethod`, indicating that it is associated with the class itself.
+
