@@ -101,7 +101,7 @@ a tuple is a fixed-length array where each element has a particular type, often 
 
 for each user you want to represent a pair of values
 
-`let user = [number, string] = [1, "Mostafa"]`
+`let user:[number, string] = [1, "Mostafa"]`
 
 ### enum type
 
@@ -780,8 +780,8 @@ interface Car {
 const myCar: Car = {
   brand: "Toyota",
   model: "Camry",
-  color: "blue",   // Valid
-  year: "2022",    // Valid
+  color: "blue", // Valid
+  year: "2022", // Valid
   // someNumber: 123 // Error: Property 'someNumber' does not exist on type 'Car'.
 };
 ```
@@ -839,76 +839,76 @@ Static members in TypeScript (and other object-oriented programming languages) s
 
 1. **Shared Data**: Static members are shared among all instances of a class. They provide a way to store data that is common to all instances and is associated with the class itself. This can be useful for maintaining shared state or configuration.
 
-    ```typescript
-    class Logger {
-      static logLevel: string = "info";
+   ```typescript
+   class Logger {
+     static logLevel: string = "info";
 
-      static log(message: string): void {
-        if (Logger.logLevel === "info") {
-          console.log(message);
-        }
-      }
-    }
+     static log(message: string): void {
+       if (Logger.logLevel === "info") {
+         console.log(message);
+       }
+     }
+   }
 
-    Logger.log("This is an informational message.");
-    ```
+   Logger.log("This is an informational message.");
+   ```
 
 2. **Utility Functions**: Static methods can be used to define utility functions that are related to the class but do not depend on the state of any specific instance. These methods can be called directly on the class.
 
-    ```typescript
-    class MathUtils {
-      static add(x: number, y: number): number {
-        return x + y;
-      }
-    }
+   ```typescript
+   class MathUtils {
+     static add(x: number, y: number): number {
+       return x + y;
+     }
+   }
 
-    const result = MathUtils.add(3, 5);
-    ```
+   const result = MathUtils.add(3, 5);
+   ```
 
 3. **Constants**: Static members can be used to define constants associated with a class. These values are the same for all instances and can be accessed without creating an instance.
 
-    ```typescript
-    class Constants {
-      static PI: number = 3.14159;
-    }
+   ```typescript
+   class Constants {
+     static PI: number = 3.14159;
+   }
 
-    console.log(Constants.PI);
-    ```
+   console.log(Constants.PI);
+   ```
 
 4. **Factory Methods**: Static methods can be used to create instances of a class or provide alternative ways of instantiation.
 
-    ```typescript
-    class Point {
-      constructor(public x: number, public y: number) {}
+   ```typescript
+   class Point {
+     constructor(public x: number, public y: number) {}
 
-      static createOrigin(): Point {
-        return new Point(0, 0);
-      }
-    }
+     static createOrigin(): Point {
+       return new Point(0, 0);
+     }
+   }
 
-    const origin = Point.createOrigin();
-    ```
+   const origin = Point.createOrigin();
+   ```
 
 5. **Singleton Pattern**: Static members can be used to implement singleton patterns, ensuring that only one instance of a class is created.
 
-    ```typescript
-    class Singleton {
-      private static instance: Singleton;
+   ```typescript
+   class Singleton {
+     private static instance: Singleton;
 
-      private constructor() {}
+     private constructor() {}
 
-      static getInstance(): Singleton {
-        if (!Singleton.instance) {
-          Singleton.instance = new Singleton();
-        }
-        return Singleton.instance;
-      }
-    }
+     static getInstance(): Singleton {
+       if (!Singleton.instance) {
+         Singleton.instance = new Singleton();
+       }
+       return Singleton.instance;
+     }
+   }
 
-    const singletonInstance1 = Singleton.getInstance();
-    const singletonInstance2 = Singleton.getInstance();
-    console.log(singletonInstance1 === singletonInstance2); // true
-    ```
+   const singletonInstance1 = Singleton.getInstance();
+   const singletonInstance2 = Singleton.getInstance();
+   console.log(singletonInstance1 === singletonInstance2); // true
+   ```
 
 These are just a few examples, and the use of static members can vary based on the design and requirements of your application. They provide a way to organize and encapsulate functionality that is associated with a class as a whole rather than with instances of the class.
 
@@ -923,6 +923,7 @@ On the other hand, the `static` keyword is used to define static members, which 
 Here's a brief summary:
 
 - **Access Modifiers:**
+
   - `public`: The member is accessible from outside the class.
   - `private`: The member is only accessible within the class.
   - `protected`: The member is accessible within the class and its subclasses.
@@ -934,8 +935,8 @@ Example using access modifiers and static keyword:
 
 ```typescript
 class Example {
-  public instanceProperty: number;  // Public instance property
-  private static staticProperty: string = "Static property";  // Private static property
+  public instanceProperty: number; // Public instance property
+  private static staticProperty: string = "Static property"; // Private static property
 
   constructor(value: number) {
     this.instanceProperty = value;
@@ -962,3 +963,95 @@ Example.staticMethod();
 
 In this example, `instanceProperty` is a public instance property, and `staticProperty` is a private static property. The `static` keyword is used to define `staticMethod`, indicating that it is associated with the class itself.
 
+## Inheritance
+
+In OOP if two or more objects have some commonalities it's best to extract those commonalities and put them in a single place and inherit those commonalities by each sub classes, this way we have effectively avoid repeating ourselves and room for errors.
+
+**two classes sharing same properties**
+
+![two classes sharing same properties](./twoClassesSharingMembers.png)
+
+**two classes inherit their members from a common parent**
+
+![two classes inherit their members](./classesInheritingMembers.png)
+
+**Terminologies**:
+
+in the above example the **Person** class is called: **Parent**, **Super**, **Base**,
+and **Student** and **Teacher** classes are called: **Child**, **Sub**, **Derived** recursively
+
+```ts
+class Person {
+  // here we define properties that are shared among all it's child classes
+  // defining "parameter properties" this way using "access modifiers"
+
+  constructor(public firstName: string, public lastName: string) {}
+
+  get fullName(): string {
+    return `${this.firstName} ${this.lastName}`;
+  }
+
+  walk(): void {
+    console.log("walking");
+  }
+}
+
+class Student extends Person {
+  // here we don't really need to use "access modifiers" because we have already used them defining these shared properties in the "super class"
+  constructor(public studentId: number, firstName: string, lastName: string) {
+    // in the sub-class constructor we need to call the "super" which is the constructor function of the super-class that this current class is inheriting from and pass needed parameters
+    super(firstName, lastName);
+  }
+
+  takeTest(): void {
+    console.log("Taking a test");
+  }
+}
+
+const student = new Student(1, "Mostafa", "Meerzad");
+
+console.log(student.firstName);
+// console.log(student.firstName)
+student.fullName;
+student.walk();
+student.takeTest();
+```
+
+### Method Overriding
+
+In the Inheritance we might come to a situation that we need to override the inherited class-members.
+
+**overriding** means changing it's implementation.
+
+here we have a _Person_ class that is the super class
+
+```ts
+class Person {
+  constructor(public firstName: string, public lastName: string) {}
+
+  get fullName(): string {
+    return `${this.firstName} ${this.lastName}`;
+  }
+
+  walk(): void {
+    console.log("walking");
+  }
+}
+```
+
+and a _Teacher_ class which is a **sub-class** of _Person_ which is overriding **fullName** getter function of it's parent
+
+```ts
+class Teacher extends Person {
+  // Note: if you are not going to add more properties to the class you can omit the constructor of the sub-class
+  // when overriding inherited methods we need to use "override" keyword otherwise that method is going to be disconnected from the parent class and act as a property defined only in "Teacher" class
+  override get fullName(): string {
+    // return  `professor ${this.firstName} ${this.lastName}` // the one way
+    return `professor ${super.firstName} ${super.lastName}`; // access the super-class properties in the sub-class because we've already implemented the firstName and lastName properties in the constructor of the super-class
+  }
+}
+```
+
+also there is a compiler option to prevent us from implicitly override inherited method
+
+`"noImplicitOverride": true`

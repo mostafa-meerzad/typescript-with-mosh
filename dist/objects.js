@@ -23,8 +23,14 @@ let dog = {
     age: 2,
     eat: (food) => {
         console.log("eating ", food);
-    }
+    },
 };
 console.log(dog);
 dog.eat("snacks");
+const newUser = { name: "Mostafa", age: 23, greet: (msg) => {
+        console.log(msg);
+        return 's';
+    } };
+console.log(newUser.name);
+console.log(newUser.greet("hello GOD DAMN world"));
 //# sourceMappingURL=objects.js.map
