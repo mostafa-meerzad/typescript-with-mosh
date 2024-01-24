@@ -27,7 +27,9 @@ class Person {
 class Teacher extends Person {
     // Note: if you are not going to add more properties to the class you can omit the constructor of the sub-class
     get fullName() {
-        return `professor ${this.firstName} ${this.lastName}`;
+        // return  `professor ${this.firstName} ${this.lastName}`
+        // return  `professor ${this.firstName} ${this.lastName}` // the one way
+        return `professor ${super.firstName} ${super.lastName}`; // access the super-class properties in the sub-class because we've already implemented the firstName and lastName properties in the constructor of the super-class
     }
 }
 const teacher = new Teacher("Mostafa", "Meerzad");

@@ -1055,3 +1055,89 @@ class Teacher extends Person {
 also there is a compiler option to prevent us from implicitly override inherited method
 
 `"noImplicitOverride": true`
+
+## Polymorphism
+
+Polymorphism in TypeScript refers to the ability of a class or interface to take on multiple forms. It allows a single entity, such as a function, method, or object, to work with different types while maintaining a consistent interface. There are two main types of polymorphism in TypeScript: compile-time (static) polymorphism and runtime (dynamic) polymorphism.
+
+1. **Compile-time Polymorphism (Method Overloading):**
+   This type of polymorphism occurs at compile time. It involves defining multiple methods with the same name in a class, but with different parameter types or a different number of parameters. TypeScript will then choose the appropriate method based on the provided arguments during compilation.
+
+   ```typescript
+   class Calculator {
+     add(x: number, y: number): number {
+       return x + y;
+     }
+
+     add(x: string, y: string): string {
+       return x + y;
+     }
+   }
+
+   const calculator = new Calculator();
+   console.log(calculator.add(2, 3)); // Outputs: 5
+   console.log(calculator.add("Hello", "World")); // Outputs: HelloWorld
+   ```
+
+2. **Runtime Polymorphism (Inheritance and Method Overriding):**
+   Runtime polymorphism occurs when a subclass provides a specific implementation of a method that is already defined in its superclass. It allows objects of different derived classes to be treated as objects of the base class, while still invoking the overridden method of the specific subclass.
+
+   ```typescript
+   class Animal {
+     makeSound(): void {
+       console.log("Generic animal sound");
+     }
+   }
+
+   class Dog extends Animal {
+     makeSound(): void {
+       console.log("Woof! Woof!");
+     }
+   }
+
+   class Cat extends Animal {
+     makeSound(): void {
+       console.log("Meow");
+     }
+   }
+
+   const dog: Animal = new Dog();
+   const cat: Animal = new Cat();
+
+   dog.makeSound(); // Outputs: Woof! Woof!
+   cat.makeSound(); // Outputs: Meow
+   ```
+
+In the example above, both `Dog` and `Cat` classes extend the `Animal` class, and they provide their own implementation of the `makeSound` method. When instances of these subclasses are treated as instances of the base class `Animal`, the appropriate overridden method is called at runtime.
+
+Polymorphism helps make code more flexible, reusable, and easier to maintain by allowing the same code to work with different types.
+
+### Override keyword usage
+
+In TypeScript, the `override` keyword is not explicitly used for method overriding like in some other programming languages (e.g., C#). Instead, TypeScript relies on a more implicit mechanism for method overriding. When you declare a method in a subclass with the same signature as a method in its superclass, TypeScript considers it an override. The overridden method in the subclass is expected to provide a specific implementation.
+
+Here's an example:
+
+```typescript
+class Animal {
+  makeSound(): void {
+    console.log("Generic animal sound");
+  }
+}
+
+class Dog extends Animal {
+  makeSound(): void {
+    console.log("Woof! Woof!");
+  }
+}
+
+class Cat extends Animal {
+  makeSound(): void {
+    console.log("Meow");
+  }
+}
+```
+
+In this example, both `Dog` and `Cat` classes extend the `Animal` class and override the `makeSound` method. There's no need for an explicit `override` keyword in TypeScript. The compiler recognizes the method with the same signature in the subclass as an override.
+
+If you mistakenly provide a method in the subclass with a different signature, TypeScript will treat it as a new method, not an override. It's a good practice to use the `override` keyword in other languages, but TypeScript's type system handles this implicitly based on method signatures. Always ensure that the method in the subclass has the same name and signature as the method in the superclass to achieve method overriding.
