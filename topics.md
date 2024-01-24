@@ -1141,3 +1141,107 @@ class Cat extends Animal {
 In this example, both `Dog` and `Cat` classes extend the `Animal` class and override the `makeSound` method. There's no need for an explicit `override` keyword in TypeScript. The compiler recognizes the method with the same signature in the subclass as an override.
 
 If you mistakenly provide a method in the subclass with a different signature, TypeScript will treat it as a new method, not an override. It's a good practice to use the `override` keyword in other languages, but TypeScript's type system handles this implicitly based on method signatures. Always ensure that the method in the subclass has the same name and signature as the method in the superclass to achieve method overriding.
+
+## Interfaces
+
+In TypeScript, interfaces play a crucial role in defining contracts for object shapes. They allow you to specify the structure that an object should have by defining the properties and their types. Interfaces provide a way to enforce a consistent structure across various parts of your code, making it easier to catch errors and ensure that your code adheres to a predefined structure.
+
+Here's a basic overview of interfaces in TypeScript:
+
+### Declaring an Interface:
+
+You can declare an interface using the `interface` keyword, followed by the interface name and a set of property declarations:
+
+```typescript
+interface Person {
+  firstName: string;
+  lastName: string;
+  age: number;
+}
+```
+
+### Using Interfaces:
+
+1. **Object Structure:**
+   You can use interfaces to define the structure of objects:
+
+   ```typescript
+   const person: Person = {
+     firstName: "John",
+     lastName: "Doe",
+     age: 30,
+   };
+   ```
+
+   This ensures that the `person` object adheres to the structure specified by the `Person` interface.
+
+2. **Function Signatures:**
+   Interfaces can also be used to define function signatures:
+
+   ```typescript
+   interface Greeter {
+     greet(message: string): void;
+   }
+
+   const myGreeter: Greeter = {
+     greet(message: string) {
+       console.log(`Greetings: ${message}`);
+     },
+   };
+   ```
+
+### Optional Properties:
+
+You can make certain properties optional in an interface by using the `?` symbol:
+
+```typescript
+interface Car {
+  brand: string;
+  model: string;
+  year?: number; // Optional property
+}
+```
+
+### Readonly Properties:
+
+You can make properties read-only by using the `readonly` modifier:
+
+```typescript
+interface Point {
+  readonly x: number;
+  readonly y: number;
+}
+```
+
+### Extending Interfaces:
+
+Interfaces can extend other interfaces, creating a new interface that inherits the properties of existing interfaces:
+
+```typescript
+interface Employee {
+  employeeId: number;
+  position: string;
+}
+
+interface Manager extends Employee {
+  department: string;
+}
+```
+
+### Implementing Interfaces (for Classes):
+
+You can use the `implements` keyword to enforce that a class adheres to a particular interface:
+
+```typescript
+class EmployeeClass implements Employee {
+  employeeId: number;
+  position: string;
+
+  constructor(id: number, position: string) {
+    this.employeeId = id;
+    this.position = position;
+  }
+}
+```
+
+Interfaces in TypeScript are a powerful tool for defining contracts, enabling type checking, and promoting code consistency and maintainability. They are particularly useful in scenarios where you want to ensure that objects or classes conform to a specific structure or behavior.
