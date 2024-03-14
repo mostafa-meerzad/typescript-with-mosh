@@ -1245,3 +1245,58 @@ class EmployeeClass implements Employee {
 ```
 
 Interfaces in TypeScript are a powerful tool for defining contracts, enabling type checking, and promoting code consistency and maintainability. They are particularly useful in scenarios where you want to ensure that objects or classes conform to a specific structure or behavior.
+
+## Generics
+
+### Understand the problem
+
+consider the following example:
+
+```ts
+class KeyValuePair {
+  constructor(public key: number, public value: string) {}
+}
+
+const pair = new KeyValuePair(1, "Apple");
+// pair.key here you can view all the methods available for a number
+```
+
+`const StringPair = new KeyValuePair("1", "Banana");`
+
+we can not use a **string** instead of a **number**: "Argument of type 'string' is not assignable to parameter of type 'number'."
+
+**we got two solutions**
+
+1. use any type and lose all type-safety and intellisense
+2. create a new class that accepts string as key and create a lot of redundancy and need to create new separate classes every time you need to use a different value
+
+_the solution is to have a generic class that can take different value types_
+
+### Generics explained
+
+Generics in TypeScript provide a way to create flexible and reusable components by allowing types to be parameterized. They enable you to write functions, classes, and interfaces that can work with different data types without sacrificing type safety. Generics are particularly useful when you want to write code that is more generic and can handle various data types without explicitly specifying them.
+
+### Generic classes
+
+in generic classes we put one or more generic-type-parameter
+like this and use that type-parameter for the type of properties
+
+```ts
+class KeyValuePair<T> {
+  constructor(public key: T, public value: string) {}
+}
+```
+
+**Note:** **T** is pretty common and the idea comes from C++ and it refers to **template-class** but you can use anything use want
+
+```ts
+class KeyValuePair<K, V> {
+  constructor(public key: K, public value: V) {}
+}
+// all of these instances are valid and correct
+const pair = new KeyValuePair<number, string>(1, "Apple");
+const pair = new KeyValuePair<string, string>("1", "Apple");
+const pair = new KeyValuePair(1, "Apple");
+```
+
+we don't necessarily need to explicitly specify type-parameters since the TS-compiler is smart enough to infer the types from the provided values.
