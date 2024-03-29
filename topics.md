@@ -640,6 +640,9 @@ const obj = new Example(10);
    }
 
    const childObj = new Child(20);
+   // we can't access the x property outside the subclass like this:
+   childObj.x; // this is going to throw an error
+
    // console.log(childObj.x); // Error: Property 'x' is protected and only accessible within class 'Parent' and its subclasses.
    ```
 
@@ -754,7 +757,7 @@ console.log(rectangle.area); // Using the getter
 
 In this example, the `Rectangle` class has private properties `_width` and `_height`, and public getters and setters for these properties. The getters and setters allow controlled access to the internal state of the object, enabling additional logic or validation to be applied when getting or setting the values.
 
-## Index Signatures
+### Index Signatures
 
 In TypeScript, index signatures allow you to define the types of properties that can exist on an object with keys that are not known at compile time. This is particularly useful when working with objects that can have dynamic property names. Index signatures are specified using square brackets `[]` and a specific type for the keys.
 
@@ -790,7 +793,7 @@ In this example, the `Car` interface has specific properties `brand` and `model`
 
 It's important to note that the index signature allows you to add properties, but it doesn't enforce that all properties must have the same type. In the example above, the additional properties must be of type `string`, but you could have different values for different properties.
 
-## Static Members
+### Static Members
 
 In TypeScript, static members refer to properties or methods that belong to a class itself rather than to instances of the class. They are associated with the class itself, not with the instances created from the class. Static members are declared using the `static` keyword in TypeScript.
 
@@ -833,7 +836,7 @@ instance2.instanceMethod(); // Output: This is an instance method.
 
 In this example, `staticProperty` and `staticMethod` are static members of the `MyClass` class. They are accessed directly on the class itself, without the need to create an instance of the class. On the other hand, `instanceProperty` and `instanceMethod` are instance members, and they can be accessed only through instances of the class.
 
-### Static Members Usage
+#### Static Members Usage
 
 Static members in TypeScript (and other object-oriented programming languages) serve various purposes and are used in different scenarios. Here are some common use cases for static members:
 
@@ -912,7 +915,7 @@ Static members in TypeScript (and other object-oriented programming languages) s
 
 These are just a few examples, and the use of static members can vary based on the design and requirements of your application. They provide a way to organize and encapsulate functionality that is associated with a class as a whole rather than with instances of the class.
 
-### Static Keyword vs Access-Modifiers
+#### Static Keyword vs Access-Modifiers
 
 No, the `static` keyword is not an access modifier in TypeScript, although it is often used in conjunction with access modifiers.
 
@@ -963,7 +966,7 @@ Example.staticMethod();
 
 In this example, `instanceProperty` is a public instance property, and `staticProperty` is a private static property. The `static` keyword is used to define `staticMethod`, indicating that it is associated with the class itself.
 
-## Inheritance
+### Inheritance
 
 In OOP if two or more objects have some commonalities it's best to extract those commonalities and put them in a single place and inherit those commonalities by each sub classes, this way we have effectively avoid repeating ourselves and room for errors.
 
@@ -1056,7 +1059,7 @@ also there is a compiler option to prevent us from implicitly override inherited
 
 `"noImplicitOverride": true`
 
-## Polymorphism
+### Polymorphism
 
 Polymorphism in TypeScript refers to the ability of a class or interface to take on multiple forms. It allows a single entity, such as a function, method, or object, to work with different types while maintaining a consistent interface. There are two main types of polymorphism in TypeScript: compile-time (static) polymorphism and runtime (dynamic) polymorphism.
 
@@ -1112,7 +1115,7 @@ In the example above, both `Dog` and `Cat` classes extend the `Animal` class, an
 
 Polymorphism helps make code more flexible, reusable, and easier to maintain by allowing the same code to work with different types.
 
-### Override keyword usage
+#### Override keyword usage
 
 In TypeScript, the `override` keyword is not explicitly used for method overriding like in some other programming languages (e.g., C#). Instead, TypeScript relies on a more implicit mechanism for method overriding. When you declare a method in a subclass with the same signature as a method in its superclass, TypeScript considers it an override. The overridden method in the subclass is expected to provide a specific implementation.
 
@@ -1142,13 +1145,84 @@ In this example, both `Dog` and `Cat` classes extend the `Animal` class and over
 
 If you mistakenly provide a method in the subclass with a different signature, TypeScript will treat it as a new method, not an override. It's a good practice to use the `override` keyword in other languages, but TypeScript's type system handles this implicitly based on method signatures. Always ensure that the method in the subclass has the same name and signature as the method in the superclass to achieve method overriding.
 
-## Interfaces
+### Abstract Classes and Methods
+
+In some situations when we are breaking down a more complex problem into smaller ones some classes might appear that doesn't make sense to be used directly and is just making the concepts more concise nothing else, just like **uncooked meal** is part of your launch but is not ready to be eaten yet.
+
+```ts
+class Shape {
+  constructor(public color: string) {}
+
+  render() {}
+}
+
+class Circle extends Shape {
+  constructor(public radius: number, color: string) {
+    super(color);
+  }
+
+  render(): void {
+    console.log("Rendering a Circle");
+  }
+}
+```
+
+**the problem:**
+with current implementation we can do something like this:
+
+```ts
+const shape = new Shape("red");
+shape.render();
+```
+
+render method in shape class doesn't have any implementation and logically it doesn't make sense to render a shape object that has not defined shape!
+
+In such cases abstract classes are the solution, which prevents us from making this mistakes
+by signing a class as abstract we're telling TS that this specific class is not ready to be used.
+
+```ts
+abstract class Shape {
+  constructor(public color: string) {}
+
+  render() {}
+}
+
+class Circle extends Shape {
+  constructor(public radius: number, color: string) {
+    super(color);
+  }
+
+  render(): void {
+    console.log("Rendering a Circle");
+  }
+}
+```
+
+```ts
+const shape = new Shape("red");
+```
+
+now we can't create an instance from the shape class
+
+**Note:** Quite often with abstract classes we have abstract methods which has no implementation but must have a return type just as following:
+
+```ts
+abstract class Shape {
+  constructor(public color: string) {}
+
+  abstract render(): void;
+}
+```
+
+**NOTE:** abstract methods can only exist inside abstract classes.
+
+### Interfaces
 
 In TypeScript, interfaces play a crucial role in defining contracts for object shapes. They allow you to specify the structure that an object should have by defining the properties and their types. Interfaces provide a way to enforce a consistent structure across various parts of your code, making it easier to catch errors and ensure that your code adheres to a predefined structure.
 
 Here's a basic overview of interfaces in TypeScript:
 
-### Declaring an Interface:
+#### Declaring an Interface:
 
 You can declare an interface using the `interface` keyword, followed by the interface name and a set of property declarations:
 
@@ -1160,7 +1234,7 @@ interface Person {
 }
 ```
 
-### Using Interfaces:
+#### Using Interfaces:
 
 1. **Object Structure:**
    You can use interfaces to define the structure of objects:
@@ -1190,7 +1264,7 @@ interface Person {
    };
    ```
 
-### Optional Properties:
+#### Optional Properties:
 
 You can make certain properties optional in an interface by using the `?` symbol:
 
@@ -1202,7 +1276,7 @@ interface Car {
 }
 ```
 
-### Readonly Properties:
+#### Readonly Properties:
 
 You can make properties read-only by using the `readonly` modifier:
 
@@ -1213,7 +1287,7 @@ interface Point {
 }
 ```
 
-### Extending Interfaces:
+#### Extending Interfaces:
 
 Interfaces can extend other interfaces, creating a new interface that inherits the properties of existing interfaces:
 
@@ -1228,7 +1302,7 @@ interface Manager extends Employee {
 }
 ```
 
-### Implementing Interfaces (for Classes):
+#### Implementing Interfaces (for Classes):
 
 You can use the `implements` keyword to enforce that a class adheres to a particular interface:
 
@@ -1246,57 +1320,3 @@ class EmployeeClass implements Employee {
 
 Interfaces in TypeScript are a powerful tool for defining contracts, enabling type checking, and promoting code consistency and maintainability. They are particularly useful in scenarios where you want to ensure that objects or classes conform to a specific structure or behavior.
 
-## Generics
-
-### Understand the problem
-
-consider the following example:
-
-```ts
-class KeyValuePair {
-  constructor(public key: number, public value: string) {}
-}
-
-const pair = new KeyValuePair(1, "Apple");
-// pair.key here you can view all the methods available for a number
-```
-
-`const StringPair = new KeyValuePair("1", "Banana");`
-
-we can not use a **string** instead of a **number**: "Argument of type 'string' is not assignable to parameter of type 'number'."
-
-**we got two solutions**
-
-1. use any type and lose all type-safety and intellisense
-2. create a new class that accepts string as key and create a lot of redundancy and need to create new separate classes every time you need to use a different value
-
-_the solution is to have a generic class that can take different value types_
-
-### Generics explained
-
-Generics in TypeScript provide a way to create flexible and reusable components by allowing types to be parameterized. They enable you to write functions, classes, and interfaces that can work with different data types without sacrificing type safety. Generics are particularly useful when you want to write code that is more generic and can handle various data types without explicitly specifying them.
-
-### Generic classes
-
-in generic classes we put one or more generic-type-parameter
-like this and use that type-parameter for the type of properties
-
-```ts
-class KeyValuePair<T> {
-  constructor(public key: T, public value: string) {}
-}
-```
-
-**Note:** **T** is pretty common and the idea comes from C++ and it refers to **template-class** but you can use anything use want
-
-```ts
-class KeyValuePair<K, V> {
-  constructor(public key: K, public value: V) {}
-}
-// all of these instances are valid and correct
-const pair = new KeyValuePair<number, string>(1, "Apple");
-const pair = new KeyValuePair<string, string>("1", "Apple");
-const pair = new KeyValuePair(1, "Apple");
-```
-
-we don't necessarily need to explicitly specify type-parameters since the TS-compiler is smart enough to infer the types from the provided values.
