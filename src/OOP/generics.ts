@@ -21,3 +21,28 @@ class KeyValuePair<K, V> {
 const pair1 = new KeyValuePair<number, string>(1, "Apple");
 const pair2 = new KeyValuePair<string, string>("1", "Apple");
 const pair3 = new KeyValuePair(1, "Apple");
+
+// function wrapInArray(value: number){
+//   return [value]
+// }
+// function wrapInArray<T>(value: T){
+//   return [value]
+// }
+
+class ArrayUtils {
+  // a generic function can be an object's method
+  wrapInArray<T>(value: T) {
+    return [value];
+  }
+  // a generic function can also be an object's static member
+  static wrapInArray<T>(value: T) {
+    return [value];
+  }
+}
+
+const utils = new ArrayUtils();
+const numArr = utils.wrapInArray(10);
+const strArr = ArrayUtils.wrapInArray("10");
+const objArr = utils.wrapInArray({ value: 10 });
+const objArr2 = ArrayUtils.wrapInArray({ value: 10 });
+
