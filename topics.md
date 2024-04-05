@@ -1419,15 +1419,48 @@ A generic interface can define properties and methods with types that are not sp
 
 ```ts
 interface GenericIdentityFn<T> {
-    (arg: T): T;
+  (arg: T): T;
 }
 
 function identity<T>(arg: T): T {
-    return arg;
+  return arg;
 }
 
 let myIdentity: GenericIdentityFn<number> = identity;
-
 ```
 
 In this example, GenericIdentityFn is an interface with a type parameter T. It specifies a function signature that takes an argument of type T and returns a value of type T. When we implement this interface with myIdentity, we specify that T should be number, making myIdentity a function that takes a number and returns a number.
+
+#### Generic Constraints
+
+Sometimes with using generics we need to limit the valid types so our application accepts just the types that are valid and not causing it to crash.
+
+```ts
+function echo<T extends string | numbers>(value: T): T {
+  return echo;
+}
+```
+
+this generic function only accepts string and number values
+
+```ts
+// interface Person1 {
+  // name: string;
+  // }
+  // or
+class Person1 {
+  constructor(public name: string) {}
+}
+
+// function echo<T extends {name: string}>(value: T): T {
+  // return value;
+// }
+// or
+function echo<T extends Person1>(value: T): T {
+  return value;
+}
+
+// echo("Hello TS")
+// echo(100)
+echo({ name: "Mostafa" });
+```

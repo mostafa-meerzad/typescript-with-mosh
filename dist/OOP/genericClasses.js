@@ -20,12 +20,6 @@ class KeyValuePair {
 const pair1 = new KeyValuePair(1, "Apple");
 const pair2 = new KeyValuePair("1", "Apple");
 const pair3 = new KeyValuePair(1, "Apple");
-// function wrapInArray(value: number){
-//   return [value]
-// }
-// function wrapInArray<T>(value: T){
-//   return [value]
-// }
 class ArrayUtils {
     // a generic function can be an object's method
     wrapInArray(value) {
@@ -41,4 +35,4 @@ const numArr = utils.wrapInArray(10);
 const strArr = ArrayUtils.wrapInArray("10");
 const objArr = utils.wrapInArray({ value: 10 });
 const objArr2 = ArrayUtils.wrapInArray({ value: 10 });
-//# sourceMappingURL=generics.js.map
+//# sourceMappingURL=genericClasses.js.map
