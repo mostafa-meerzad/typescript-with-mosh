@@ -34,6 +34,6 @@ class Teacher extends Person {
   }
 }
 
-const teacher = new Teacher("Mostafa", "Meerzad");
+const teacher: Teacher = new Teacher("Mostafa", "Meerzad");
 
 console.log(teacher.fullName);

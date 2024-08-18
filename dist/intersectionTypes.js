@@ -1,6 +1,6 @@
 "use strict";
 let textBox = {
     drag: () => { },
-    resize: () => { }
+    resize: () => { },
 };
 //# sourceMappingURL=intersectionTypes.js.map

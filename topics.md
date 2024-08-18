@@ -12,12 +12,12 @@ Typescript is a programming language developed by Microsoft, it is like a supers
 
 `rootDir` option of tsconfig file is the path of your source code
 
-by convention you should put your source code in a **src** folder and set the **rootDir** config option to the path of your **src**
-and **outDir** set to a directory like **dist** which will contain all of Typescript transpiled code
+by convention you should put your source code in a `src` folder and set the `rootDir` config option to the path of your `src`
+and `outDir` set to a directory like `dist` which will contain all of Typescript transpiled code
 
-**"noEmitOnError": true** this option will not compile our code if there is any error
+`"noEmitOnError": true` this option will not compile our code if there is any error
 
-**"removeComments": true** this is also a good option to have enabled to remove comments in the compiled files
+`"removeComments": true` this is also a good option to have enabled to remove comments in the compiled files
 
 ## Compiling Ts files to Js
 
@@ -27,7 +27,7 @@ run `tsc` to compile all the files.
 
 ## Debugging
 
-first enable **sourceMap** from **tsconfig** which is going to create a sourceMap which is a file that specifies exactly how each line of our **typescript** is mapped to the generated **Javascript** code
+first enable `sourceMap` from `tsconfig` which is going to create a sourceMap which is a file that specifies exactly how each line of our `typescript` is mapped to the generated `Javascript` code
 
 for debugging Ts files with vscode debugger
 
@@ -63,7 +63,7 @@ Ts
 
 `let name: string = "mostafa"` this is how to annotate the variable type in **Ts**
 
-**typescript** compiler can detect the type of our variables by their values which means we don't always need to annotate the type for variables, if you don't declare a variable but not initialize it to a value **Ts** compiler assumes it's type as **any**
+**typescript** compiler can detect the type of our variables by their values which means we don't always need to annotate the type for variables, if you declare a variable but not initialize it to a value **Ts** compiler assumes it's type as **any**
 
 ```ts
 let name: string = "John";
@@ -154,20 +154,20 @@ function greet(name: string, age?: number): string {
 }
 ```
 
-````ts
-function calculateTax(income: number, taxYear: number = 2022){
-
-    if(taxYear < 2022){
-        return income * 1.2;
-    }
-    return income * 1.1;
-}```
+```ts
+function calculateTax(income: number, taxYear: number = 2022) {
+  if (taxYear < 2022) {
+    return income * 1.2;
+  }
+  return income * 1.1;
+}
+```
 
 ```ts
 function greet(name = "John"): string {
   return `Hello ${name}, How are you!`;
 }
-````
+```
 
 ### objects
 
@@ -210,7 +210,13 @@ let dog: { name: string; age: number; eat: (food: string) => void } = {
 };
 ```
 
-`let employee:{ id:number, name:string, retire:(date:Date)=>void} = {id:1, name:"John", retire:(date)=>console.log(date)}`
+```ts
+let employee: { id: number; name: string; retire: (date: Date) => void } = {
+  id: 1,
+  name: "John",
+  retire: (date) => console.log(date),
+};
+```
 
 ## Advanced types
 
@@ -793,6 +799,68 @@ In this example, the `Car` interface has specific properties `brand` and `model`
 
 It's important to note that the index signature allows you to add properties, but it doesn't enforce that all properties must have the same type. In the example above, the additional properties must be of type `string`, but you could have different values for different properties.
 
+In TypeScript, an index signature allows you to specify the types of properties that are not explicitly defined in the interface. When you use an index signature, it essentially states that any property not explicitly listed in the interface can have the specified type. However, this affects the existing property types because TypeScript enforces consistency between the explicitly defined properties and the index signature.
+
+Here is why it happens:
+
+1. **Type Consistency**: TypeScript ensures that all properties, including those explicitly defined and those accessed via the index signature, are consistent with the index signature's type. If a property type doesn't match the index signature's type, it results in a type conflict.
+
+2. **Design Decision**: This behavior is by design in TypeScript to prevent type inconsistencies and potential runtime errors. If the index signature allows a broader type than the explicitly defined properties, accessing those properties might result in unexpected types.
+
+Here is an example to illustrate this:
+
+### Problematic Code
+
+```typescript
+interface Car {
+  brand: string; // string
+  model: string; // string
+  doors: number; // number
+  isNew: boolean; // boolean, but index signature doesn't allow boolean
+  [key: string]: string | number; // Index signature allows only string or number
+}
+```
+
+### Why it Causes an Error
+
+In this case, `isNew` is defined as a `boolean`, but the index signature only allows `string | number`. This causes a type conflict because `boolean` is not allowed by the index signature.
+
+### Corrected Code
+
+To correct this, you need to include `boolean` in the index signature:
+
+```typescript
+interface Car {
+  brand: string;
+  model: string;
+  doors: number;
+  isNew: boolean;
+  [key: string]: string | number | boolean; // Include boolean in index signature
+}
+```
+
+### Explanation
+
+By including `boolean` in the index signature, you ensure that any property, whether explicitly defined or accessed via the index signature, is allowed to be a `string`, `number`, or `boolean`.
+
+### Alternative Approach
+
+If you need stricter type definitions for specific properties and still want to allow additional properties with varying types, consider using a separate property for additional data:
+
+```typescript
+interface Car {
+  brand: string;
+  model: string;
+  doors: number;
+  isNew: boolean;
+  additionalProperties?: {
+    [key: string]: string | number | boolean;
+  };
+}
+```
+
+This way, you maintain strict typing for known properties and still have flexibility for additional properties. The known properties are typed explicitly, while `additionalProperties` can store any other properties with the allowed types.
+
 ### Static Members
 
 In TypeScript, static members refer to properties or methods that belong to a class itself rather than to instances of the class. They are associated with the class itself, not with the instances created from the class. Static members are declared using the `static` keyword in TypeScript.
@@ -1175,7 +1243,7 @@ const shape = new Shape("red");
 shape.render();
 ```
 
-render method in shape class doesn't have any implementation and logically it doesn't make sense to render a shape object that has not defined shape!
+render method in shape class doesn't have any implementation and logically it doesn't make sense to render a shape object that has no defined shape!
 
 In such cases abstract classes are the solution, which prevents us from making this mistakes
 by signing a class as abstract we're telling TS that this specific class is not ready to be used.
@@ -1443,24 +1511,147 @@ function echo<T extends string | numbers>(value: T): T {
 
 this generic function only accepts string and number values
 
-```ts
-// interface Person1 {
-  // name: string;
-  // }
-  // or
-class Person1 {
-  constructor(public name: string) {}
-}
+not only that, we can also constrain by a shape object like so:
 
-// function echo<T extends {name: string}>(value: T): T {
-  // return value;
-// }
-// or
-function echo<T extends Person1>(value: T): T {
+```ts
+// constrain the function-argument types to only string and number
+function echo<T extends string | number>(value: T): T {
   return value;
 }
 
-// echo("Hello TS")
-// echo(100)
-echo({ name: "Mostafa" });
+// we can also constrain types by a shape object like so
+function echoPerson<T extends { name: string; age: number }>(value: T): T {
+  return value;
+}
+// or define an interface instead of a shape object
+interface NewPerson {
+  name: string;
+  age: number;
+}
+function echoPerson2<T extends NewPerson>(value: T): T {
+  return value;
+}
+
+class PersonClass {
+  constructor(public name: string) {
+    this.name = name;
+  }
+  walk() {
+    return `${this.name} is walking`;
+  }
+  talk() {
+    return `${this.name} is talking`;
+  }
+}
+
+class CustomerClass extends PersonClass {}
+// this function now accepts any object that confirms to the PersonClass
+function echoPerson3<T extends PersonClass>(value: T): T {
+  return value;
+}
+
+console.log(echo("hello"));
+console.log(echo(100));
+console.log(echo(0));
+
+console.log(echoPerson({ name: "John", age: 30 }));
+console.log(echoPerson2({ name: "Mostafa", age: 24 }));
+
+echoPerson3(new PersonClass("John"));
+echoPerson3(new CustomerClass("Jamie"));
 ```
+
+#### Extending Generic Classes
+
+Extending generic classes in TypeScript allows you to create new classes that are based on existing generic classes while retaining or modifying their generic properties. This is useful for creating more specific implementations while leveraging the flexibility and type safety of generics.
+
+Here's a step-by-step explanation with an example:
+
+### Step 1: Define a Generic Class
+
+Let's start by defining a generic class. This class will have a type parameter `T` that can be replaced with any type when the class is instantiated.
+
+```typescript
+class GenericClass<T> {
+  private value: T;
+
+  constructor(value: T) {
+    this.value = value;
+  }
+
+  getValue(): T {
+    return this.value;
+  }
+
+  setValue(value: T): void {
+    this.value = value;
+  }
+}
+```
+
+### Step 2: Extend the Generic Class
+
+To extend the `GenericClass`, you need to specify the type parameter(s) for the new class. You can either use the same type parameter `T` or introduce new type parameters.
+
+#### Example 1: Using the Same Type Parameter
+
+Here, we extend `GenericClass` without introducing new type parameters. The new class `ExtendedGenericClass` will also be generic with type parameter `T`.
+
+```typescript
+class ExtendedGenericClass<T> extends GenericClass<T> {
+  constructor(value: T) {
+    super(value);
+  }
+
+  describeValue(): string {
+    return `The value is ${this.getValue()}`;
+  }
+}
+```
+
+#### Example 2: Introducing a New Type Parameter
+
+You can introduce new type parameters if needed. Here, `AnotherGenericClass` introduces a new type parameter `U` in addition to `T`.
+
+```typescript
+class AnotherGenericClass<T, U> extends GenericClass<T> {
+  private extraValue: U;
+
+  constructor(value: T, extraValue: U) {
+    super(value);
+    this.extraValue = extraValue;
+  }
+
+  getExtraValue(): U {
+    return this.extraValue;
+  }
+
+  setExtraValue(extraValue: U): void {
+    this.extraValue = extraValue;
+  }
+}
+```
+
+### Step 3: Instantiate the Classes
+
+You can now create instances of these classes with specific types.
+
+```typescript
+const stringInstance = new ExtendedGenericClass<string>("Hello");
+console.log(stringInstance.describeValue()); // Output: The value is Hello
+
+const numberStringInstance = new AnotherGenericClass<number, string>(
+  42,
+  "Answer"
+);
+console.log(numberStringInstance.getValue()); // Output: 42
+console.log(numberStringInstance.getExtraValue()); // Output: Answer
+```
+
+### Summary
+
+- **Define a Generic Class**: Create a class with a generic type parameter.
+- **Extend the Generic Class**: Create new classes that extend the generic class, using the same or new type parameters.
+- **Instantiate the Classes**: Create instances of these extended classes with specific types.
+
+Extending generic classes allows you to build flexible and reusable components that can work with a variety of data types while maintaining type safety.

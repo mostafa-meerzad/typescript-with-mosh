@@ -23,3 +23,28 @@ seats.A3 = "John"
 seats["A4"] = "Mostafa"
 seats["A5"] = "Mat"
 
+const x :{
+  [key: number]: string
+} = {}
+
+x[1] = "first value"
+console.log(x)
+
+
+interface Car {
+  brand: string;
+  model: string;
+  doors: number;
+  isNew: boolean;
+  [key: string]: string | number;
+}
+
+const myCar: Car = {
+    brand: "BMW",
+    model: "M2",
+    doors: 4,
+    isNew: false,
+    color: "blue"
+}
+
+console.log(myCar)

@@ -1,8 +1,22 @@
-"use strict";
 // interface Person {
 //   name: string;
 //   age: number;
 // }
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 // class Person1 {
 //   constructor(public name: string) {}
 //   // name: string;
@@ -27,20 +41,26 @@ function echoPerson(value) {
 function echoPerson2(value) {
     return value;
 }
-class PersonClass {
-    constructor(name) {
+var PersonClass = /** @class */ (function () {
+    function PersonClass(name) {
         this.name = name;
         this.name = name;
     }
-    walk() {
-        return `${this.name} is walking`;
-    }
-    static getPerson() {
+    PersonClass.prototype.walk = function () {
+        return "".concat(this.name, " is walking");
+    };
+    PersonClass.getPerson = function () {
         return new PersonClass(this.name);
+    };
+    return PersonClass;
+}());
+var CustomerClass = /** @class */ (function (_super) {
+    __extends(CustomerClass, _super);
+    function CustomerClass() {
+        return _super !== null && _super.apply(this, arguments) || this;
     }
-}
-class CustomerClass extends PersonClass {
-}
+    return CustomerClass;
+}(PersonClass));
 // this function now accepts any object that confirms to the PersonClass
 function echoPerson3(value) {
     return value;
@@ -54,4 +74,3 @@ console.log(echoPerson3({ name: "Mostafa", age: 24 }));
 echoPerson3(new PersonClass("John"));
 echoPerson3(new CustomerClass("Jamie"));
 echoPerson3({ name: "soemthing" });
-//# sourceMappingURL=genericConstraints.js.map
