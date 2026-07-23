@@ -23,10 +23,12 @@
 // In such cases abstract classes are the solution, which prevents us from making this mistakes
 // by signing a class as abstract we're telling TS that this specific class is not ready to be used.
 
+// Abstract classes can't be instantiated — they're blueprints for subclasses.
+// Abstract methods have no body; every subclass MUST implement them.
 abstract class Shape {
   constructor(public color: string) {}
 
-  render() {}
+  abstract render(): void; // no body — subclasses must provide implementation
 }
 
 class Circle extends Shape {
@@ -39,7 +41,20 @@ class Circle extends Shape {
   }
 }
 
-const shape = new Shape("red");
-// now we can't create an instance from the shape class
+class Square extends Shape {
+  constructor(public side: number, color: string) {
+    super(color);
+  }
 
-shape.render(); // but 
+  render(): void {
+    console.log("Rendering a Square");
+  }
+}
+
+// const shape = new Shape("red"); // Error: Cannot create an instance of an abstract class
+
+const circle = new Circle(5, "red");
+circle.render(); // "Rendering a Circle"
+
+const square = new Square(10, "blue");
+square.render(); // "Rendering a Square"

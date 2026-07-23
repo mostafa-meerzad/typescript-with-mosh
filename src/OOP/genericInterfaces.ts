@@ -29,4 +29,4 @@ interface Product{
 // result.data.username
 
 let result = fetch<Product>("url");
-result.data.title
+result.data?.title; // optional chaining needed because data is T | null

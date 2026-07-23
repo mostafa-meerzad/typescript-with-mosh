@@ -19,6 +19,41 @@ and `outDir` set to a directory like `dist` which will contain all of Typescript
 
 `"removeComments": true` this is also a good option to have enabled to remove comments in the compiled files
 
+### `strict` Mode
+
+The single most important tsconfig option. `"strict": true` is a shorthand that enables a group of strict checks all at once. Always turn this on for new projects.
+
+| Option | What it does |
+|---|---|
+| `strict: true` | Enables all the options below at once |
+| `strictNullChecks` | `null` and `undefined` are not assignable to other types — the most impactful flag; without it TS barely catches null bugs |
+| `noImplicitAny` | Error when TypeScript can't infer a type and would silently fall back to `any` |
+| `strictFunctionTypes` | Stricter checking of function parameter types (enforces contravariance) |
+| `strictPropertyInitialization` | Class properties must be initialized in the constructor — prevents `undefined` at runtime |
+| `useUnknownInCatchVariables` | Caught errors in `catch (e)` are typed as `unknown` instead of `any` (TS 4.4+) |
+| `noImplicitOverride` | Requires `override` keyword when overriding a parent method |
+| `noImplicitReturns` | Error if not all code paths in a function return a value |
+| `noUnusedLocals` | Error on declared but unused local variables |
+| `noUnusedParameters` | Error on declared but unused function parameters |
+
+Minimal recommended `tsconfig.json` for any project:
+
+```json
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "strict": true,
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noEmitOnError": true,
+    "sourceMap": true,
+    "outDir": "./dist",
+    "rootDir": "./src"
+  }
+}
+```
+
 ## Compiling Ts files to Js
 
 run `tsc filePath` to compile that exact file.
@@ -39,6 +74,43 @@ for debugging Ts files with vscode debugger
    4. **shift + F11** step out of a function.
    5. **ctrl + shift + F5** to restart the debugging
    6. **shift + F5** to stop debugging
+
+## How TypeScript's Type System Works: Structural Typing
+
+TypeScript uses **structural typing** (also called "duck typing"), not nominal typing. Two types are compatible if they have the **same shape** — their names or origins don't matter. This is fundamentally different from Java or C#, where two types are only compatible if one explicitly extends the other.
+
+```ts
+class Cat { name: string = "Cat"; meow() {} }
+class Dog { name: string = "Dog"; meow() {} }
+
+// Same shape → compatible, even though they're different classes
+const dog: Dog = new Cat(); // ✅ no error!
+```
+
+```ts
+interface Point { x: number; y: number; }
+
+function printPoint(p: Point) {
+  console.log(p.x, p.y);
+}
+
+// An object with extra properties is still assignable to Point
+const obj = { x: 10, y: 20, z: 30 };
+printPoint(obj); // ✅ works — obj is a structural superset of Point
+```
+
+### Excess Property Checking
+
+There is one important exception: TypeScript applies **excess property checking** when you assign an **object literal directly** to a typed variable. This catches typos in object literals.
+
+```ts
+printPoint({ x: 10, y: 20, z: 30 }); // ❌ Error: object literal may only specify known properties
+
+const obj2 = { x: 10, y: 20, z: 30 };
+printPoint(obj2); // ✅ No error — excess check only applies to fresh object literals
+```
+
+**Interview tip:** "TypeScript uses structural typing — a type is satisfied if the value has at least the required shape. The exception is direct object literals, where extra properties are flagged (excess property checking)."
 
 ## Built-in types
 
@@ -124,6 +196,39 @@ use PascalCase for naming enums
 
 `enum SomeEnum {}` will output in a verbose way to solve it just declare your enum as a `const enum SomeEnum {}`
 
+### `enum` vs `const enum` vs Literal Union — When to Use Which
+
+This is a common interview question. Each approach has different trade-offs.
+
+```ts
+// Regular enum — compiles to a real JavaScript object
+enum Direction { Up = "UP", Down = "DOWN" }
+// Output JS: var Direction = { Up: "UP", Down: "DOWN", UP: "Up", DOWN: "Down" }
+// You can iterate over values: Object.values(Direction)
+
+// const enum — values are inlined at compile time, NO JS object generated
+const enum Status { Active = "active", Inactive = "inactive" }
+// console.log(Status.Active) compiles to: console.log("active") — just the string, no lookup
+
+// Literal union — no enum at all, pure TypeScript
+type Locale = "en" | "fr" | "de";
+```
+
+| Feature | `enum` | `const enum` | Literal union |
+|---|---|---|---|
+| Runtime JS object | ✅ yes | ❌ (inlined) | ❌ |
+| Bundle size | larger | smallest | smallest |
+| Works with `isolatedModules` / `.d.ts` | ✅ | ❌ (breaks) | ✅ |
+| Reverse mapping | ✅ numeric only | ❌ | ❌ |
+| JSON serializable | ✅ | ✅ | ✅ |
+| Refactor-safe | ✅ | ✅ | ✅ |
+| TypeScript-only (erased) | ❌ | ✅ | ✅ |
+
+**Rule of thumb:**
+- Use **literal unions** (`type Status = "active" \| "inactive"`) for most cases — zero runtime overhead, works everywhere, simple.
+- Use **`enum`** when you need to iterate over all values at runtime (`Object.values(MyEnum)`).
+- Avoid **`const enum`** in library code or projects using `isolatedModules` (Vite, esbuild) — they can cause subtle bugs because the values are inlined into every consuming file at compile time.
+
 ### functions
 
 basically means that you should clarify what values the arguments, and the returned value be if it returns any value otherwise return type is **void** meaning (not returning anything)
@@ -173,13 +278,13 @@ function greet(name = "John"): string {
 
 defining an object
 
-`let employee: {id:number, name:string} = {id= 1, name:"John"}`
+`let employee: {id:number, name:string} = {id: 1, name:"John"}`
 
 to make an object property readonly you can use **readonly** flag before the property name
 
 readonly property (id is readonly now and you can't change it at run time)
 
-`let employee: {readonly id:number, name:string} = {id= 1, name:"John"}`
+`let employee: {readonly id:number, name:string} = {id: 1, name:"John"}`
 
 optional property
 
@@ -189,7 +294,7 @@ by putting a **?** after object property name
 
 ```ts
 let employee: { readonly id: number; name: string; fax?: string } = {
-  id = 1,
+  id: 1,
   name: "John",
 };
 ```
@@ -279,6 +384,33 @@ function kgToLb(weight: number | string): number {
 console.log(kgToLb(10));
 console.log(kgToLb("10Kg"));
 ```
+
+### Discriminated Unions
+
+A discriminated union (also called a "tagged union") is a pattern where every member of a union has a **common "discriminant" property** with a literal type. TypeScript narrows the union based on that property, giving you full type safety inside each branch.
+
+```ts
+type Circle    = { kind: "circle";    radius: number };
+type Square    = { kind: "square";    side: number };
+type Rectangle = { kind: "rectangle"; width: number; height: number };
+
+type Shape = Circle | Square | Rectangle;
+
+function getArea(shape: Shape): number {
+  switch (shape.kind) {
+    case "circle":    return Math.PI * shape.radius ** 2;  // shape: Circle
+    case "square":    return shape.side ** 2;               // shape: Square
+    case "rectangle": return shape.width * shape.height;    // shape: Rectangle
+  }
+}
+```
+
+The `kind` property is the **discriminant**. Inside each `case`, TypeScript knows exactly which member of the union you're dealing with, so you get full intellisense and type safety.
+
+This pattern is extremely useful for:
+- Modelling API responses (success vs error)
+- Redux/state machine actions
+- Handling different event types
 
 ### intersection types
 
@@ -421,6 +553,60 @@ function render(document: unknown) {
 }
 ```
 
+### Type Guards
+
+Type guards are expressions that narrow a union or wide type into a more specific type inside a conditional block. TypeScript tracks these checks and adjusts the type accordingly.
+
+#### `typeof` — for primitive types
+
+```ts
+function format(value: string | number): string {
+  if (typeof value === "string") return value.toUpperCase(); // value: string here
+  return value.toFixed(2);                                   // value: number here
+}
+```
+
+Works with: `"string"`, `"number"`, `"boolean"`, `"bigint"`, `"symbol"`, `"undefined"`, `"function"`.
+
+#### `instanceof` — for class instances
+
+```ts
+function logError(error: Error | string) {
+  if (error instanceof Error) console.log(error.message); // error: Error
+  else console.log(error);                                 // error: string
+}
+```
+
+#### `in` operator — for object shapes
+
+```ts
+type Fish = { swim: () => void };
+type Bird = { fly: () => void };
+
+function move(animal: Fish | Bird) {
+  if ("swim" in animal) animal.swim(); // animal: Fish
+  else animal.fly();                   // animal: Bird
+}
+```
+
+#### User-defined type guards (`is` keyword)
+
+A function whose return type is a **type predicate** (`param is Type`). Use this when the narrowing logic is complex or needs to be reused.
+
+```ts
+function isString(value: unknown): value is string {
+  return typeof value === "string";
+}
+
+function process(value: unknown) {
+  if (isString(value)) {
+    console.log(value.toUpperCase()); // value: string — TypeScript knows!
+  }
+}
+```
+
+The `value is string` return type tells TypeScript: "if this function returns true, treat `value` as `string` in the calling scope."
+
 ### never type
 
 The never type represents the type of values that never occur. For instance, never is the return type for a function expression or an arrow function expression that always throws an exception or one that never returns.
@@ -436,6 +622,215 @@ function processEvents(): never {
 processEvents();
 console.log("something after processing events");
 ```
+
+### Exhaustiveness Checking with `never`
+
+The most practical use of `never` in day-to-day TypeScript: ensuring a `switch` handles **every member of a union**, so adding a new member to the union without updating the switch is a **compile-time error**.
+
+```ts
+type Shape =
+  | { kind: "circle"; radius: number }
+  | { kind: "square"; side: number }
+  | { kind: "triangle"; base: number; height: number };
+
+function getArea(shape: Shape): number {
+  switch (shape.kind) {
+    case "circle":   return Math.PI * shape.radius ** 2;
+    case "square":   return shape.side ** 2;
+    case "triangle": return 0.5 * shape.base * shape.height;
+    default:
+      // If you add a new Shape member and forget to handle it here,
+      // TypeScript assigns it to `never` → compile error. 
+      const _exhaustive: never = shape;
+      throw new Error(`Unhandled shape: ${JSON.stringify(_exhaustive)}`);
+  }
+}
+```
+
+If you later add `| { kind: "pentagon"; ... }` to the `Shape` union and forget to add a `case "pentagon":` branch, the `default` block will fail at compile time — `shape` would be `"pentagon"` shape, which can't be assigned to `never`. This turns a potential runtime bug into a compile-time error.
+
+### `keyof` Operator
+
+`keyof` takes an object type and produces a **string or number literal union of its property names**. It is the foundation of many utility types and index-access patterns.
+
+```ts
+interface User {
+  id: number;
+  name: string;
+  email: string;
+}
+
+type UserKeys = keyof User; // "id" | "name" | "email"
+```
+
+**Practical use — type-safe property access:**
+
+```ts
+function getProperty<T, K extends keyof T>(obj: T, key: K): T[K] {
+  return obj[key];
+}
+
+const user: User = { id: 1, name: "John", email: "john@example.com" };
+
+const name  = getProperty(user, "name");  // type: string
+const id    = getProperty(user, "id");    // type: number
+// getProperty(user, "age"); // Error — "age" is not a key of User
+```
+
+### `typeof` in Type Position
+
+When used **inside a type annotation** (not in an expression), `typeof` gets the TypeScript type of a variable or expression. This is different from JavaScript's `typeof` at runtime.
+
+```ts
+const config = { host: "localhost", port: 3000 };
+
+type Config = typeof config;
+// { host: string; port: number }
+
+function applyConfig(cfg: typeof config) {
+  console.log(cfg.host, cfg.port);
+}
+```
+
+**Combining `keyof` and `typeof`:**
+
+```ts
+const colors = { red: "#ff0000", green: "#00ff00", blue: "#0000ff" };
+
+type ColorName = keyof typeof colors; // "red" | "green" | "blue"
+
+function getColor(name: ColorName): string {
+  return colors[name];
+}
+```
+
+### Index Access Types
+
+Index access types let you look up the type of a specific property using bracket notation — the same syntax as JavaScript property access, but in type position.
+
+```ts
+interface User {
+  id: number;
+  name: string;
+  address: {
+    city: string;
+    zip: string;
+  };
+}
+
+type UserName    = User["name"];           // string
+type UserAddress = User["address"];        // { city: string; zip: string }
+type UserCity    = User["address"]["city"]; // string — chains work
+
+// keyof + index access → union of all value types
+type UserValues = User[keyof User]; // number | string | { city: string; zip: string }
+```
+
+This is exactly what `T[K]` means in the generic `getProperty` function above — the return type `T[K]` is an index access: "the type of property K on T".
+
+**With arrays — get the element type:**
+
+```ts
+const roles = ["admin", "editor", "viewer"] as const;
+type Role = typeof roles[number]; // "admin" | "editor" | "viewer"
+// typeof roles → readonly ["admin", "editor", "viewer"]
+// [number]    → index with any number → union of all element types
+```
+
+### Mapped Types
+
+Mapped types transform every property in an existing type systematically using `[K in keyof T]` syntax. They are the building block behind all the utility types (`Partial`, `Readonly`, `Record`, etc.).
+
+```ts
+// Making every property optional — this is exactly what Partial<T> does internally
+type MyPartial<T> = {
+  [K in keyof T]?: T[K];
+};
+
+// Making every property readonly — what Readonly<T> does
+type MyReadonly<T> = {
+  readonly [K in keyof T]: T[K];
+};
+
+// Removing optional from every property (the `-?` removes the `?` modifier)
+type MyRequired<T> = {
+  [K in keyof T]-?: T[K];
+};
+
+// Removing readonly from every property (`-readonly`)
+type Mutable<T> = {
+  -readonly [K in keyof T]: T[K];
+};
+```
+
+**Real-world example — typed form error map:**
+
+```ts
+interface LoginForm {
+  email: string;
+  password: string;
+}
+
+// Each field gets an optional error string — no need to maintain this by hand
+type FormErrors = {
+  [K in keyof LoginForm]?: string;
+};
+
+const errors: FormErrors = { email: "Invalid format" }; // ✅
+```
+
+**Interview tip:** If asked "how does `Partial<T>` work?", the answer is: it's a mapped type that iterates over all keys of `T` with `[K in keyof T]` and adds `?` to each property.
+
+### Template Literal Types
+
+Template literal types let you compose string literal types using template syntax — the same backtick syntax as JavaScript template strings, but in type position.
+
+```ts
+type EventName = "click" | "focus" | "blur";
+type Handler   = `on${Capitalize<EventName>}`;
+// "onClick" | "onFocus" | "onBlur"
+
+type CSSUnit  = "px" | "em" | "rem" | "%";
+type CSSValue = `${number}${CSSUnit}`;
+// Accepts strings like "10px", "1.5em", "100%" — not just any string
+```
+
+**Practical use — typed API endpoints:**
+
+```ts
+type HttpMethod = "GET" | "POST" | "PUT" | "DELETE";
+type Endpoint   = "/users" | "/products" | "/orders";
+type Route      = `${HttpMethod} ${Endpoint}`;
+// "GET /users" | "GET /products" | "POST /users" | ...
+```
+
+Useful for event emitters, CSS-in-JS, API client typings, and anywhere you have structured string patterns.
+
+### `as const` Assertion
+
+`as const` freezes a value so that:
+1. All properties / elements become `readonly`
+2. Values are inferred as **literal types** instead of being widened to `string`, `number`, etc.
+
+```ts
+// Without as const — widened types
+const config = { host: "localhost", port: 3000 };
+// type: { host: string; port: number }
+
+// With as const — literal types, fully readonly
+const config2 = { host: "localhost", port: 3000 } as const;
+// type: { readonly host: "localhost"; readonly port: 3000 }
+```
+
+**Deriving a string union from an array:**
+
+```ts
+const directions = ["north", "south", "east", "west"] as const;
+
+type Direction = typeof directions[number]; // "north" | "south" | "east" | "west"
+```
+
+Without `as const`, `typeof directions[number]` would be just `string`. With it you get a precise literal union — no separate `type Direction = ...` declaration needed.
 
 ## Object Oriented Programming
 
@@ -1131,23 +1526,34 @@ also there is a compiler option to prevent us from implicitly override inherited
 
 Polymorphism in TypeScript refers to the ability of a class or interface to take on multiple forms. It allows a single entity, such as a function, method, or object, to work with different types while maintaining a consistent interface. There are two main types of polymorphism in TypeScript: compile-time (static) polymorphism and runtime (dynamic) polymorphism.
 
-1. **Compile-time Polymorphism (Method Overloading):**
-   This type of polymorphism occurs at compile time. It involves defining multiple methods with the same name in a class, but with different parameter types or a different number of parameters. TypeScript will then choose the appropriate method based on the provided arguments during compilation.
+1. **Compile-time Polymorphism (Function/Method Overloading):**
+   TypeScript supports overloading through **overload signatures** — you declare multiple signatures above a single implementation. TypeScript picks the right signature at compile time based on the arguments.
+
+   > **Important:** Unlike Java or C#, TypeScript does NOT allow two separate method bodies with the same name. You declare overload signatures, then one implementation that handles all cases.
 
    ```typescript
-   class Calculator {
-     add(x: number, y: number): number {
-       return x + y;
-     }
+   // Function overloading
+   function add(x: number, y: number): number;
+   function add(x: string, y: string): string;
+   function add(x: number | string, y: number | string): number | string {
+     return (x as any) + (y as any);
+   }
 
-     add(x: string, y: string): string {
-       return x + y;
+   console.log(add(2, 3));           // Outputs: 5
+   console.log(add("Hello", " World")); // Outputs: Hello World
+
+   // Method overloading in a class (same pattern)
+   class Calculator {
+     add(x: number, y: number): number;
+     add(x: string, y: string): string;
+     add(x: number | string, y: number | string): number | string {
+       return (x as any) + (y as any);
      }
    }
 
    const calculator = new Calculator();
-   console.log(calculator.add(2, 3)); // Outputs: 5
-   console.log(calculator.add("Hello", "World")); // Outputs: HelloWorld
+   console.log(calculator.add(2, 3));           // Outputs: 5
+   console.log(calculator.add("Hello", " World")); // Outputs: Hello World
    ```
 
 2. **Runtime Polymorphism (Inheritance and Method Overriding):**
@@ -1185,9 +1591,14 @@ Polymorphism helps make code more flexible, reusable, and easier to maintain by 
 
 #### Override keyword usage
 
-In TypeScript, the `override` keyword is not explicitly used for method overriding like in some other programming languages (e.g., C#). Instead, TypeScript relies on a more implicit mechanism for method overriding. When you declare a method in a subclass with the same signature as a method in its superclass, TypeScript considers it an override. The overridden method in the subclass is expected to provide a specific implementation.
+Since TypeScript 4.3, the `override` keyword is supported and recommended when overriding a parent method. It makes the intent explicit and catches mistakes at compile time (e.g., if the parent method is renamed or removed).
 
-Here's an example:
+Enable strict override checking in `tsconfig.json`:
+```json
+"noImplicitOverride": true
+```
+
+With this option enabled, TypeScript requires the `override` keyword whenever you override a parent method — preventing accidental disconnects.
 
 ```typescript
 class Animal {
@@ -1197,21 +1608,19 @@ class Animal {
 }
 
 class Dog extends Animal {
-  makeSound(): void {
+  override makeSound(): void {  // explicit override — compiler verifies parent has this method
     console.log("Woof! Woof!");
   }
 }
 
 class Cat extends Animal {
-  makeSound(): void {
+  override makeSound(): void {
     console.log("Meow");
   }
 }
 ```
 
-In this example, both `Dog` and `Cat` classes extend the `Animal` class and override the `makeSound` method. There's no need for an explicit `override` keyword in TypeScript. The compiler recognizes the method with the same signature in the subclass as an override.
-
-If you mistakenly provide a method in the subclass with a different signature, TypeScript will treat it as a new method, not an override. It's a good practice to use the `override` keyword in other languages, but TypeScript's type system handles this implicitly based on method signatures. Always ensure that the method in the subclass has the same name and signature as the method in the superclass to achieve method overriding.
+Without `override`, if the parent renames `makeSound()` to `playSound()`, the subclass method silently becomes a new unrelated method — a hard-to-find bug. With `override`, TypeScript immediately reports an error.
 
 ### Abstract Classes and Methods
 
@@ -1249,10 +1658,11 @@ In such cases abstract classes are the solution, which prevents us from making t
 by signing a class as abstract we're telling TS that this specific class is not ready to be used.
 
 ```ts
+// Abstract class with an abstract method — subclasses MUST implement render()
 abstract class Shape {
   constructor(public color: string) {}
 
-  render() {}
+  abstract render(): void; // no body — defines a contract for subclasses
 }
 
 class Circle extends Shape {
@@ -1264,25 +1674,29 @@ class Circle extends Shape {
     console.log("Rendering a Circle");
   }
 }
-```
 
-```ts
-const shape = new Shape("red");
-```
+class Square extends Shape {
+  constructor(public side: number, color: string) {
+    super(color);
+  }
 
-now we can't create an instance from the shape class
-
-**Note:** Quite often with abstract classes we have abstract methods which has no implementation but must have a return type just as following:
-
-```ts
-abstract class Shape {
-  constructor(public color: string) {}
-
-  abstract render(): void;
+  render(): void {
+    console.log("Rendering a Square");
+  }
 }
 ```
 
-**NOTE:** abstract methods can only exist inside abstract classes.
+```ts
+// const shape = new Shape("red"); // Error: Cannot create an instance of an abstract class
+```
+
+**Abstract methods:**
+- Have no body (no `{}`)
+- Must specify a return type
+- Force every subclass to provide its own implementation
+- **Can only exist inside abstract classes**
+
+**Note:** You can also have non-abstract (concrete) methods in an abstract class — those are inherited as-is without needing an override.
 
 ### Interfaces
 
@@ -1387,6 +1801,49 @@ class EmployeeClass implements Employee {
 ```
 
 Interfaces in TypeScript are a powerful tool for defining contracts, enabling type checking, and promoting code consistency and maintainability. They are particularly useful in scenarios where you want to ensure that objects or classes conform to a specific structure or behavior.
+
+### Interface vs Type Alias
+
+Both `interface` and `type` can describe the shape of an object, but they have key differences — a common interview topic.
+
+| Feature | `interface` | `type` |
+|---|---|---|
+| Describe object shapes | ✅ | ✅ |
+| Union types | ❌ | ✅ `type A = B \| C` |
+| Intersection/extension | `extends` keyword | `&` operator |
+| Primitives / tuples | ❌ | ✅ `type ID = string \| number` |
+| Declaration merging | ✅ (reopen and merge) | ❌ (error if redeclared) |
+| `implements` by a class | ✅ | ✅ |
+| Mapped / computed types | ❌ | ✅ |
+
+```ts
+// Declaration merging — ONLY interfaces support this (useful for augmenting library types)
+interface Window { myPlugin: () => void; }
+interface Window { myOtherPlugin: () => void; }
+// Both declarations merge automatically into one Window interface
+
+// Union types — only possible with type aliases
+type ID = number | string;
+type Status = "active" | "inactive" | "pending";
+
+// Extending
+interface Animal { name: string; }
+interface Dog extends Animal { breed: string; }   // interface extends interface
+
+type Animal2 = { name: string; };
+type Dog2 = Animal2 & { breed: string; };          // intersection achieves the same result
+
+// Classes can implement both
+class MyDog implements Dog {
+  name = "Rex";
+  breed = "Labrador";
+}
+```
+
+**Rule of thumb:**
+- Use `interface` for public API shapes, OOP class contracts, and library type augmentation.
+- Use `type` for unions, intersections, primitive aliases, tuples, and complex type transformations.
+- When either works, pick one and be consistent within the codebase.
 
 ## Generics
 
@@ -1504,8 +1961,8 @@ In this example, GenericIdentityFn is an interface with a type parameter T. It s
 Sometimes with using generics we need to limit the valid types so our application accepts just the types that are valid and not causing it to crash.
 
 ```ts
-function echo<T extends string | numbers>(value: T): T {
-  return echo;
+function echo<T extends string | number>(value: T): T {
+  return value;
 }
 ```
 
@@ -1655,3 +2112,140 @@ console.log(numberStringInstance.getExtraValue()); // Output: Answer
 - **Instantiate the Classes**: Create instances of these extended classes with specific types.
 
 Extending generic classes allows you to build flexible and reusable components that can work with a variety of data types while maintaining type safety.
+
+## Utility Types
+
+TypeScript ships with built-in generic utility types for common type transformations. These are heavily used in real-world TypeScript and appear frequently in interviews.
+
+### `Partial<T>`
+Makes all properties of `T` **optional**.
+
+```ts
+interface User { id: number; name: string; email: string; }
+
+type PartialUser = Partial<User>;
+// { id?: number; name?: string; email?: string }
+
+function updateUser(id: number, changes: Partial<User>) { /* apply only the fields that changed */ }
+```
+
+### `Required<T>`
+Makes all properties of `T` **required** (opposite of `Partial`).
+
+```ts
+type RequiredUser = Required<PartialUser>;
+// { id: number; name: string; email: string }
+```
+
+### `Readonly<T>`
+Makes all properties of `T` **read-only** — they cannot be reassigned after creation.
+
+```ts
+type ReadonlyUser = Readonly<User>;
+const user: ReadonlyUser = { id: 1, name: "John", email: "john@x.com" };
+user.name = "Jane"; // Error: cannot assign to 'name' because it is a read-only property
+```
+
+### `Record<K, V>`
+Creates an object type with keys `K` and values `V`. Great for maps and lookup tables.
+
+```ts
+type Role = "admin" | "editor" | "viewer";
+type Permissions = Record<Role, string[]>;
+
+const perms: Permissions = {
+  admin:  ["read", "write", "delete"],
+  editor: ["read", "write"],
+  viewer: ["read"],
+};
+```
+
+### `Pick<T, K>`
+Creates a new type by **picking a subset** of properties `K` from `T`.
+
+```ts
+type UserPreview = Pick<User, "id" | "name">;
+// { id: number; name: string }
+```
+
+### `Omit<T, K>`
+Creates a new type by **removing** properties `K` from `T`.
+
+```ts
+type UserWithoutEmail = Omit<User, "email">;
+// { id: number; name: string }
+```
+
+> `Pick` and `Omit` are complementary — use `Pick` when you want fewer properties, `Omit` when it's easier to list what to remove.
+
+### `Exclude<T, U>`
+Removes from a union `T` all types assignable to `U`.
+
+```ts
+type T = string | number | boolean;
+type WithoutBoolean = Exclude<T, boolean>; // string | number
+```
+
+### `Extract<T, U>`
+Keeps only the types in union `T` that are assignable to `U`.
+
+```ts
+type Extracted = Extract<T, string | number>; // string | number
+```
+
+### `NonNullable<T>`
+Removes `null` and `undefined` from type `T`.
+
+```ts
+type MaybeString = string | null | undefined;
+type DefiniteString = NonNullable<MaybeString>; // string
+```
+
+### `ReturnType<T>`
+Gets the **return type** of a function type `T`. Very useful when you want to reuse the return type without importing a separate interface.
+
+```ts
+function fetchUser() {
+  return { id: 1, name: "John", role: "admin" };
+}
+
+type FetchResult = ReturnType<typeof fetchUser>;
+// { id: number; name: string; role: string }
+```
+
+### `Parameters<T>`
+Gets the **parameter types** of a function type `T` as a tuple.
+
+```ts
+function createUser(name: string, age: number, email: string) { /* ... */ }
+
+type CreateUserParams = Parameters<typeof createUser>;
+// [name: string, age: number, email: string]
+```
+
+### `InstanceType<T>`
+Gets the instance type of a **constructor** type.
+
+```ts
+class MyService { getValue() { return 42; } }
+
+type ServiceInstance = InstanceType<typeof MyService>;
+// MyService — useful when you only have the class constructor reference
+```
+
+### Quick Reference
+
+| Utility | Purpose |
+|---|---|
+| `Partial<T>` | All props optional |
+| `Required<T>` | All props required |
+| `Readonly<T>` | All props read-only |
+| `Record<K,V>` | Object with keys K and values V |
+| `Pick<T,K>` | Keep only listed props |
+| `Omit<T,K>` | Remove listed props |
+| `Exclude<T,U>` | Remove union members assignable to U |
+| `Extract<T,U>` | Keep union members assignable to U |
+| `NonNullable<T>` | Remove null and undefined |
+| `ReturnType<T>` | Return type of a function |
+| `Parameters<T>` | Param types of a function as tuple |
+| `InstanceType<T>` | Instance type of a constructor |
